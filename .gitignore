@@ -1,0 +1,21 @@
+# ShaderDude Git Ignore
+
+# Build Files
+binaries/
+temp/
+
+# Visual Studio Specific Files
+.vs/
+*.sdf
+*.opensdf
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+
+# User-specific files
+*.suo
+*.user
+*.sln.docstates
+
+# NSight User Files
+*.nvuser
