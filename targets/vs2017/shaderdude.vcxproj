@@ -12,10 +12,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Renderer.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\Graphics\Shader.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\ShaderDude.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\Shaders\StandardShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Renderer.h" />
+    <ClInclude Include="..\..\source\ShaderDude\Graphics\Shader.h" />
+    <ClInclude Include="..\..\source\ShaderDude\ShaderDude.h" />
+    <ClInclude Include="..\..\source\ShaderDude\Shaders\StandardShader.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -65,13 +70,17 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)dependencies\ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(SolutionDir)source\ShaderDude;$(SolutionDir)dependencies\ImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>PLATFORM_WINDOWS;PLASMA_DEBUG;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;$(SolutionDir)dependencies\Debug\glfw3.lib;$(SolutionDir)dependencies\Debug\libglew32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

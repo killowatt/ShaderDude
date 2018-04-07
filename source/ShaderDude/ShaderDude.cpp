@@ -1,8 +1,35 @@
+// vvv real stuff vvv
+#include "ShaderDude.h"
+#include <fstream>
+#include <iostream>
+#include <exception>
+
+std::string ReadFile(const char* path)
+{
+	std::string file;
+	std::ifstream fileStream(path, std::ios::in);
+	if (fileStream.is_open())
+	{
+		std::string line = "";
+		while (getline(fileStream, line))
+			file += "\n" + line;
+		fileStream.close();
+		return file;
+	}
+	throw std::exception("we failed to load the file fam");
+}
+
+
+
+
+// Ex code below
+
 // Link statically with GLEW
 
 // Headers
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <Shaders\StandardShader.h>
 
 // Shader sources
 const GLchar* vertexSource = R"glsl(
@@ -68,26 +95,28 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	// Create and compile the vertex shader
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexSource, NULL);
-	glCompileShader(vertexShader);
+	StandardShader shd("Shaders/StandardShader.vs", "Shaders/StandardShader.fs");
+	shd.Enable();
+	//// Create and compile the vertex shader
+	//GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	//glShaderSource(vertexShader, 1, &vertexSource, NULL);
+	//glCompileShader(vertexShader);
 
-	// Create and compile the fragment shader
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-	glCompileShader(fragmentShader);
+	//// Create and compile the fragment shader
+	//GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	//glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
+	//glCompileShader(fragmentShader);
 
-	// Link the vertex and fragment shader into a shader program
-	GLuint shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glBindFragDataLocation(shaderProgram, 0, "outColor");
-	glLinkProgram(shaderProgram);
-	glUseProgram(shaderProgram);
+	//// Link the vertex and fragment shader into a shader program
+	//GLuint shaderProgram = glCreateProgram();
+	//glAttachShader(shaderProgram, vertexShader);
+	//glAttachShader(shaderProgram, fragmentShader);
+	//glBindFragDataLocation(shaderProgram, 0, "outColor");
+	//glLinkProgram(shaderProgram);
+	//glUseProgram(shaderProgram);
 
 	// Specify the layout of the vertex data
-	GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+	GLint posAttrib = glGetAttribLocation(shd.GetProgram(), "position");
 	glEnableVertexAttribArray(posAttrib);
 	glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
@@ -106,9 +135,9 @@ int main()
 		glfwPollEvents();
 	}
 
-	glDeleteProgram(shaderProgram);
-	glDeleteShader(fragmentShader);
-	glDeleteShader(vertexShader);
+	//glDeleteProgram(shaderProgram);
+	//glDeleteShader(fragmentShader);
+	//glDeleteShader(vertexShader);
 
 	glDeleteBuffers(1, &vbo);
 
