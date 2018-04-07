@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderDude", "targets\vs2017\shaderdude.vcxproj", "{B242B230-F4AF-41EA-A618-8E1ED84D07E1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B242B230-F4AF-41EA-A618-8E1ED84D07E1}.Debug|x64.ActiveCfg = Debug|x64
+		{B242B230-F4AF-41EA-A618-8E1ED84D07E1}.Debug|x64.Build.0 = Debug|x64
+		{B242B230-F4AF-41EA-A618-8E1ED84D07E1}.Release|x64.ActiveCfg = Release|x64
+		{B242B230-F4AF-41EA-A618-8E1ED84D07E1}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {132539CB-A167-4E65-BB61-D6B32277FA3C}
+	EndGlobalSection
+EndGlobal
