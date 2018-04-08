@@ -5,10 +5,13 @@
 void StandardShader::Initialize()
 {
 	timeLocation = glGetUniformLocation(shaderProgram, "time");
+
+	vec3 = glGetUniformLocation(shaderProgram, "col");
 }
 void StandardShader::Update()
 {
 	glUniform1f(timeLocation, glfwGetTime());
+	glUniform3f(vec3, r, g, b);
 }
 
 StandardShader::StandardShader(const char* vertexFileName, const char* fragmentFileName) :

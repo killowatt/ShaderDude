@@ -90,6 +90,9 @@ static unsigned int g_VboHandle = 0, g_ElementsHandle = 0;
 
 static float gtime;
 
+static GLFWcursor*  g_MouseCursors[ImGuiMouseCursor_COUNT] = { 0 };
+static bool         g_MouseJustPressed[3] = { false, false, false };
+
 void ImGui_ImplGlfwGL3_RenderDrawData(ImDrawData* draw_data)
 {
 	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
@@ -347,8 +350,8 @@ void ImGui_ImplGlfwGL3_NewFrame(GLFWwindow* window, float& g_Time)
 	for (int i = 0; i < 3; i++)
 	{
 		// If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
-		//io.MouseDown[i] = g_MouseJustPressed[i] || glfwGetMouseButton(g_Window, i) != 0;
-		//g_MouseJustPressed[i] = false;
+		io.MouseDown[i] = g_MouseJustPressed[i] || glfwGetMouseButton(window, i) != 0;
+		g_MouseJustPressed[i] = false;
 	}
 
 	// Update OS/hardware mouse cursor if imgui isn't drawing a software cursor
@@ -454,13 +457,13 @@ bool    ImGui_ImplGlfwGL3_Init(GLFWwindow* window, bool install_callbacks, const
 
 	// Load cursors
 	// FIXME: GLFW doesn't expose suitable cursors for ResizeAll, ResizeNESW, ResizeNWSE. We revert to arrow cursor for those.
-	//g_MouseCursors[ImGuiMouseCursor_Arrow] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
-	//g_MouseCursors[ImGuiMouseCursor_TextInput] = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
-	//g_MouseCursors[ImGuiMouseCursor_ResizeAll] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
-	//g_MouseCursors[ImGuiMouseCursor_ResizeNS] = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
-	//g_MouseCursors[ImGuiMouseCursor_ResizeEW] = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
-	//g_MouseCursors[ImGuiMouseCursor_ResizeNESW] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
-	//g_MouseCursors[ImGuiMouseCursor_ResizeNWSE] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+	g_MouseCursors[ImGuiMouseCursor_Arrow] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+	g_MouseCursors[ImGuiMouseCursor_TextInput] = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
+	g_MouseCursors[ImGuiMouseCursor_ResizeAll] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+	g_MouseCursors[ImGuiMouseCursor_ResizeNS] = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
+	g_MouseCursors[ImGuiMouseCursor_ResizeEW] = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+	g_MouseCursors[ImGuiMouseCursor_ResizeNESW] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+	g_MouseCursors[ImGuiMouseCursor_ResizeNWSE] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
 
 	if (install_callbacks)
 		//ImGui_ImplGlfw_InstallCallbacks(window);
@@ -498,7 +501,26 @@ int main()
 	ImGuiIO& io = ImGui::GetIO();
 	ImGui_ImplGlfwGL3_Init(window, true, nullptr);
 
+	ImGui::StyleColorsDark();
+	//ImGui::StyleColorsClassic();
 
+	// Load Fonts
+	// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them. 
+	// - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple. 
+	// - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
+	// - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
+	// - Read 'misc/fonts/README.txt' for more instructions and details.
+	// - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
+	//io.Fonts->AddFontDefault();
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
+	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
+	io.Fonts->AddFontFromFileTTF("dependencies/DroidSans.ttf", 16.0f);
+	//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+	//IM_ASSERT(font != NULL);
+
+	ImGui::GetStyle().WindowRounding = 0.0f;
 
 
 
@@ -578,7 +600,7 @@ int main()
 		ImGui_ImplGlfwGL3_NewFrame(window, gtime);
 
 		{
-			ImGui::GetStyle().WindowRounding = 0.0f;
+
 
 			static float f = 0.0f;
 			static int counter = 0;
@@ -600,6 +622,10 @@ int main()
 
 		// STOP
 
+		shd.r = clear_color[0];
+		shd.g = clear_color[1];
+		shd.b = clear_color[2];
+
 		shd.Enable();
 		shd.Update();
 
@@ -615,7 +641,7 @@ int main()
 		glfwPollEvents();
 	}
 
-	//glDeleteProgram(shaderProgram);
+	//glDeleteProgram(shaderProgram);f
 	//glDeleteShader(fragmentShader);
 	//glDeleteShader(vertexShader);
 

@@ -10,5 +10,10 @@ public:
 	void Initialize();
 	void Update();
 
+	int vec3;
+	float r;
+	float g;
+	float b;
+
 	StandardShader(const char* vertexFileName, const char* fragmentFileName);
 };
