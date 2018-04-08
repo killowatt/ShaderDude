@@ -56,6 +56,33 @@ void Shader::Enable() const
 {
 	glUseProgram(shaderProgram);
 }
+void Shader::Recompile()
+{
+	glDetachShader(shaderProgram, vertexShader);
+	glDetachShader(shaderProgram, fragmentShader);
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragmentShader);
+	glDeleteProgram(shaderProgram);
+
+	std::string v = ReadFile(VertexFileName.c_str());
+	const char* vertexSource = v.c_str();
+	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexSource, nullptr);
+	glCompileShader(vertexShader);
+
+	std::string f = ReadFile(FragmentFileName.c_str());
+	const char* fragmentSource = f.c_str();
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentSource, nullptr);
+	glCompileShader(fragmentShader);
+
+	shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+
+	glBindFragDataLocation(shaderProgram, 0, "outColor"); // just in case lol
+	glLinkProgram(shaderProgram);
+}
 
 Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
 	: Shader(vertexSource.c_str(), fragmentSource.c_str())
@@ -75,9 +102,7 @@ Shader::Shader(const char* vertexSource, const char* fragmentSource)
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
 
-	glBindFragDataLocation(shaderProgram, 0, "outColor");
-
-
+	glBindFragDataLocation(shaderProgram, 0, "outColor"); // just in case lol
 	glLinkProgram(shaderProgram);
 }
 Shader::~Shader()

@@ -491,7 +491,7 @@ int main()
 
 	// Load Fonts
 
-	io.Fonts->AddFontFromFileTTF("dependencies/DroidSans.ttf", 16.0f);
+	io.Fonts->AddFontFromFileTTF("dependencies/DroidSans.ttf", 36.0f);
 
 	ImGui::GetStyle().WindowRounding = 0.0f;
 
@@ -501,6 +501,8 @@ int main()
 	surf.Bind();
 
 	StandardShader shd("Shaders/StandardShader.vs", "Shaders/Galaxy.fs");
+	shd.VertexFileName = "Shaders/StandardShader.vs";
+	shd.FragmentFileName = "Shaders/Galaxy.fs";
 	shd.WindowReference = window;
 	shd.Enable();
 
@@ -541,6 +543,20 @@ int main()
 
 			if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
 				counter++;
+
+			if (ImGui::Button("Recompile"))
+			{
+				shd.Recompile();
+				shd.Enable();
+				shd.Initialize();
+
+				std::cout << "\n\nNEW SHADER\n";
+				std::cout << shd.GetCompileLog(ShaderType::Vertex);
+				std::cout << "\n\n";
+				std::cout << shd.GetCompileLog(ShaderType::Fragment);
+				std::cout << "\n";
+			}
+
 			ImGui::SameLine();
 			ImGui::Text("counter = %d", counter);
 

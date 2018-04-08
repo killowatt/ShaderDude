@@ -19,10 +19,14 @@ public:
 	uint32 GetProgram() const;
 	uint32 GetShader(ShaderType type) const;
 
+	std::string VertexFileName;
+	std::string FragmentFileName;
+
 	bool GetCompileStatus(ShaderType type) const;
 	std::string GetCompileLog(ShaderType type) const;
 
 	void Enable() const;
+	void Recompile();
 
 	virtual void Initialize() = 0; // TODO: should these be () const = 0;? probably?
 	virtual void Update() = 0;
