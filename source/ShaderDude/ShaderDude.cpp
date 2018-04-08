@@ -1338,7 +1338,7 @@ int main()
 	/* Initialize the library */
 	if (!glfwInit())
 		return -1;
-	
+
 	// Attempt to initialize the Oculus SDK
 	ovrSession ovr = MIRROR_ALLOW_OVR ? _initOVR() : 0;
 
@@ -1691,37 +1691,26 @@ int main()
 		editor.Render("TextEditor");
 		ImGui::End();
 
+
+		if (show_another_window)
 		{
 
-
+			ImGui::Begin("Help");
+			ImGui::Text("Coming Soon");
+			ImGui::End();
+		}
+		{
+			ImGui::Begin("Control Panel");
 			static float f = 0.0f;
 			static int counter = 0;
 			ImGui::Text("Hello, world!");                           // Display some text (you can use a format string too)
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
-			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+			//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
+			//ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
 			ImGui::Checkbox("Show VR", &show_demo_window);      // Edit bools storing our windows open/close state
-			ImGui::Checkbox("Another Window", &show_another_window);
+			ImGui::Checkbox("Show Help", &show_another_window);
 
-			ImGui::Text("Left Input X values = %f", touchState.Thumbstick[0].x * 100);
-			ImGui::Text("Left Input Y values = %f", touchState.Thumbstick[0].y * 100);
-			ImGui::Text("Right Input X values = %f", touchState.Thumbstick[1].x * 100);
-			ImGui::Text("Right Input Y values = %f", touchState.Thumbstick[1].y * 100);
-
-			ImGui::NewLine();
-
-			ImGui::Text("Left Index Trigger = %f", touchState.IndexTrigger[0] * 100);
-			ImGui::Text("Left Hand Trigger = %f", touchState.HandTrigger[0] * 100);
-			ImGui::Text("Right Index Trigger = %f", touchState.IndexTrigger[1] * 100);
-			ImGui::Text("Right Hand Trigger = %f", touchState.HandTrigger[1] * 100);
-
-			if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
-				counter++;
-
-			ImGui::NewLine();
-			ImGui::NewLine();
-
-			ImGui::InputText("pixel shader filename", fragFile, IM_ARRAYSIZE(fragFile));
+			ImGui::InputText("Shader FileName", fragFile, IM_ARRAYSIZE(fragFile));
 
 			if (ImGui::Button("Recompile"))
 			{
@@ -1738,20 +1727,48 @@ int main()
 				std::cout << "\n";
 			}
 
-			//ImGui::SameLine();
-			ImGui::Text("counter = %d", counter);
+			ImGui::NewLine();
+			ImGui::NewLine();
 
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			if (ImGui::CollapsingHeader("Technical Info"))
+			{
+				ImGui::Text("Analog Stick Values");
+				ImGui::Text("Left Input X values = %f", touchState.Thumbstick[0].x * 100);
+				ImGui::Text("Left Input Y values = %f", touchState.Thumbstick[0].y * 100);
+				ImGui::Text("Right Input X values = %f", touchState.Thumbstick[1].x * 100);
+				ImGui::Text("Right Input Y values = %f", touchState.Thumbstick[1].y * 100);
+
+				ImGui::NewLine();
+
+				ImGui::Text("Trigger Values");
+				ImGui::Text("Left Index Trigger = %f", touchState.IndexTrigger[0] * 100);
+				ImGui::Text("Left Hand Trigger = %f", touchState.HandTrigger[0] * 100);
+				ImGui::Text("Right Index Trigger = %f", touchState.IndexTrigger[1] * 100);
+				ImGui::Text("Right Hand Trigger = %f", touchState.HandTrigger[1] * 100);
+
+				ImGui::NewLine();
+
+				ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+			}
+
+
+			ImGui::End();
+			//if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
+			//	counter++;
+
+
+			//ImGui::SameLine();
+			//ImGui::Text("counter = %d", counter);
 
 			//ImGui::SetWindowFontScale(2.5f);
 
 		}
 
-
 		// STOP
 
 		//io.FontGlobalScale = 2.0f;
-		
+
 
 		shd.Enable();
 		shd.Update();
