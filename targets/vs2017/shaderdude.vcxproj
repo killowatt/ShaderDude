@@ -16,6 +16,7 @@
     <ClCompile Include="..\..\dependencies\ImGui\imgui_draw.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Renderer.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Shader.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\Graphics\Surface.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\ShaderDude.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Shaders\StandardShader.cpp" />
   </ItemGroup>
@@ -28,6 +29,7 @@
     <ClInclude Include="..\..\dependencies\ImGui\stb_truetype.h" />
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Renderer.h" />
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Shader.h" />
+    <ClInclude Include="..\..\source\ShaderDude\Graphics\Surface.h" />
     <ClInclude Include="..\..\source\ShaderDude\ShaderDude.h" />
     <ClInclude Include="..\..\source\ShaderDude\Shaders\StandardShader.h" />
   </ItemGroup>

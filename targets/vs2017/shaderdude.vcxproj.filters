@@ -20,6 +20,9 @@
     <ClCompile Include="..\..\dependencies\ImGui\imgui_draw.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\ShaderDude\Graphics\Surface.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -60,6 +63,9 @@
     </ClInclude>
     <ClInclude Include="..\..\dependencies\ImGui\stb_truetype.h">
       <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ShaderDude\Graphics\Surface.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

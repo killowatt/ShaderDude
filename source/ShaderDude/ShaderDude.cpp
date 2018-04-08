@@ -32,9 +32,11 @@ std::string ReadFile(const char* path)
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <Shaders\StandardShader.h>
+#include <Graphics\Surface.h>
 
 #include "imgui.h"
 #include "GLFW\glfw3native.h"
+
 
 // Shader sources
 
@@ -512,28 +514,31 @@ int main()
 	// Tst code
 
 
-	// Create Vertex Array Object
-	GLuint vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
+	//// Create Vertex Array Object
+	//GLuint vao;
+	//glGenVertexArrays(1, &vao);
+	//glBindVertexArray(vao);
 
-	// Create a Vertex Buffer Object and copy the vertex data to it
-	GLuint vbo;
-	glGenBuffers(1, &vbo);
+	//// Create a Vertex Buffer Object and copy the vertex data to it
+	//GLuint vbo;
+	//glGenBuffers(1, &vbo);
 
-	GLfloat vertices[] =
-	{
-		-1, 1,
-		1, 1,
-		-1, -1,
+	//GLfloat vertices[] =
+	//{
+	//	-1, 1,
+	//	1, 1,
+	//	-1, -1,
 
-		1, 1,
-		1, -1,
-		-1, -1
-	};
+	//	1, 1,
+	//	1, -1,
+	//	-1, -1
+	//};
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	//glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	Surface surf;
+	surf.Bind();
 
 	StandardShader shd("Shaders/StandardShader.vs", "Shaders/StandardShader.fs");
 	shd.Enable();
@@ -545,28 +550,10 @@ int main()
 	std::cout << shd.GetCompileLog(ShaderType::Fragment);
 
 
-	//// Create and compile the vertex shader
-	//GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	//glShaderSource(vertexShader, 1, &vertexSource, NULL);
-	//glCompileShader(vertexShader);
-
-	//// Create and compile the fragment shader
-	//GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	//glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
-	//glCompileShader(fragmentShader);
-
-	//// Link the vertex and fragment shader into a shader program
-	//GLuint shaderProgram = glCreateProgram();
-	//glAttachShader(shaderProgram, vertexShader);
-	//glAttachShader(shaderProgram, fragmentShader);
-	//glBindFragDataLocation(shaderProgram, 0, "outColor");
-	//glLinkProgram(shaderProgram);
-	//glUseProgram(shaderProgram);
-
-	// Specify the layout of the vertex data
-	GLint posAttrib = glGetAttribLocation(shd.GetProgram(), "position");
-	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	//// Specify the layout of the vertex data
+	//GLint posAttrib = glGetAttribLocation(shd.GetProgram(), "position");
+	//glEnableVertexAttribArray(posAttrib);
+	//glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 	// imgui]
 	bool show_demo_window = true;
@@ -625,15 +612,19 @@ int main()
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
+		int width, height;
+		glfwGetWindowSize(window, &width, &height);
+		glViewport(0, 0, width, height);
 	}
 
 	//glDeleteProgram(shaderProgram);f
 	//glDeleteShader(fragmentShader);
 	//glDeleteShader(vertexShader);
 
-	glDeleteBuffers(1, &vbo);
+	//glDeleteBuffers(1, &vbo);
 
-	glDeleteVertexArrays(1, &vao);
+	//glDeleteVertexArrays(1, &vao);
 
 
 	return 0;
