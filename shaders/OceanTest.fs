@@ -1,3 +1,5 @@
+
+
 /*
  * "Seascape" by Alexander Alekseev aka TDM - 2014
  * License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
@@ -193,5 +195,4 @@ void main()
     	pow(smoothstep(0.0,-0.05,dir.y),0.3));
 
     // post
-	outColor = vec4(pow(color,vec3(0.75)), 1.0);
-}
+	outColor = vec4(pow(color,vec3(0.75)), 1.0); }

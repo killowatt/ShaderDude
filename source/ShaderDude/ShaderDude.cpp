@@ -642,6 +642,8 @@ int main()
 	bool running = true;
 	while (running)
 	{
+		static char fragFile[128] = "";
+
 		// Clear the screen to black
 		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -661,7 +663,22 @@ int main()
 				if (ImGui::MenuItem("Save"))
 				{
 					auto textToSave = editor.GetText();
+
+					std::ofstream out(fragFile);
+					out << textToSave;
+					out.close();
 					/// save text....
+				}
+				if (ImGui::MenuItem("Open"))
+				{
+					static const char* fileToEdit = fragFile;
+					//	static const char* fileToEdit = "test.cpp";
+
+					{
+						std::string fil = ReadFile(fragFile);
+						editor.SetText(fil);
+
+					}
 				}
 				if (ImGui::MenuItem("Quit", "Alt-F4"))
 					break;
@@ -735,7 +752,6 @@ int main()
 			ImGui::NewLine();
 			ImGui::NewLine();
 
-			static char fragFile[128] = "";
 			ImGui::InputText("pixel shader filename", fragFile, IM_ARRAYSIZE(fragFile));
 
 			if (ImGui::Button("Recompile"))
