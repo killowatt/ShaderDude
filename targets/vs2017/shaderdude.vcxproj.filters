@@ -27,6 +27,9 @@
       <Filter>ImGui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\ShaderDude\OVR_PlatformLoader.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\Graphics\lodepng.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -73,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="..\..\dependencies\ImGui\TextEditor.h">
       <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ShaderDude\Graphics\lodepng.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

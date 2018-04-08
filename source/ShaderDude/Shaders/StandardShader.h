@@ -11,6 +11,8 @@ class StandardShader : public Shader
 	int variablesLocation;
 	int triggersLocation;
 
+	int textureLocation;
+
 public:
 	GLFWwindow* WindowReference;
 

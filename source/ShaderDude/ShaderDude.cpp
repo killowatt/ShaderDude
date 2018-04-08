@@ -1469,7 +1469,7 @@ int main()
 
 
 	// imgui]
-	bool show_demo_window = true;
+	bool show_demo_window = false;
 	bool show_another_window = false;
 
 	ovr_GetInputState(ovr, ovrControllerType_Active, &touchState);
@@ -1700,7 +1700,7 @@ int main()
 			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
 			ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
-			ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our windows open/close state
+			ImGui::Checkbox("Show VR", &show_demo_window);      // Edit bools storing our windows open/close state
 			ImGui::Checkbox("Another Window", &show_another_window);
 
 			ImGui::Text("Left Input X values = %f", touchState.Thumbstick[0].x * 100);
@@ -1751,6 +1751,7 @@ int main()
 		// STOP
 
 		//io.FontGlobalScale = 2.0f;
+		
 
 		shd.Enable();
 		shd.Update();
@@ -1763,211 +1764,213 @@ int main()
 		ImGui::Render();
 		ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
-
-
-		// Compute how much time has elapsed since the last frame
-		std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-		std::chrono::duration<float> deltaTime = currentTime - lastTime;
-		float deltaSeconds = deltaTime.count();
-		lastTime = currentTime;
-		_elapsedSeconds += deltaSeconds;
-
-		shd.Enable();
-
-		// AAAAAAAAA
-		if (ovr)
+		if (show_demo_window)
 		{
+			// Compute how much time has elapsed since the last frame
+			std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
+			std::chrono::duration<float> deltaTime = currentTime - lastTime;
+			float deltaSeconds = deltaTime.count();
+			lastTime = currentTime;
+			_elapsedSeconds += deltaSeconds;
 
-			// Call ovr_GetRenderDesc each frame to get the ovrEyeRenderDesc, as the returned values (e.g. HmdToEyeOffset) may change at runtime.
-			ovrEyeRenderDesc eyeRenderDesc[2];
-			eyeRenderDesc[0] = ovr_GetRenderDesc(ovr, ovrEye_Left, hmdDesc.DefaultEyeFov[0]);
-			eyeRenderDesc[1] = ovr_GetRenderDesc(ovr, ovrEye_Right, hmdDesc.DefaultEyeFov[1]);
+			shd.Enable();
 
-			// Get eye poses, feeding in correct IPD offset
-			ovrPosef                  eyeRenderPose[2];
-			ovrVector3f               hmdToEyeOffset[2] = { eyeRenderDesc[0].HmdToEyeOffset, eyeRenderDesc[1].HmdToEyeOffset };
-			double sensorSampleTime;
-			ovr_GetEyePoses(ovr, frameIndex, ovrTrue, hmdToEyeOffset, eyeRenderPose, &sensorSampleTime);
 
-			// If the avatar is initialized, update it
-			if (_avatar)
+			// AAAAAAAAA
+			if (ovr)
 			{
-				// Convert the OVR inputs into Avatar SDK inputs
-				ovrInputState touchState;
-				ovr_GetInputState(ovr, ovrControllerType_Active, &touchState);
-				ovrTrackingState trackingState = ovr_GetTrackingState(ovr, 0.0, false);
 
-				glm::vec3 hmdP = _glmFromOvrVector(trackingState.HeadPose.ThePose.Position);
-				glm::quat hmdQ = _glmFromOvrQuat(trackingState.HeadPose.ThePose.Orientation);
-				glm::vec3 leftP = _glmFromOvrVector(trackingState.HandPoses[ovrHand_Left].ThePose.Position);
-				glm::quat leftQ = _glmFromOvrQuat(trackingState.HandPoses[ovrHand_Left].ThePose.Orientation);
-				glm::vec3 rightP = _glmFromOvrVector(trackingState.HandPoses[ovrHand_Right].ThePose.Position);
-				glm::quat rightQ = _glmFromOvrQuat(trackingState.HandPoses[ovrHand_Right].ThePose.Orientation);
+				// Call ovr_GetRenderDesc each frame to get the ovrEyeRenderDesc, as the returned values (e.g. HmdToEyeOffset) may change at runtime.
+				ovrEyeRenderDesc eyeRenderDesc[2];
+				eyeRenderDesc[0] = ovr_GetRenderDesc(ovr, ovrEye_Left, hmdDesc.DefaultEyeFov[0]);
+				eyeRenderDesc[1] = ovr_GetRenderDesc(ovr, ovrEye_Right, hmdDesc.DefaultEyeFov[1]);
 
-				ovrAvatarTransform hmd;
-				_ovrAvatarTransformFromGlm(hmdP, hmdQ, glm::vec3(1.0f), &hmd);
+				// Get eye poses, feeding in correct IPD offset
+				ovrPosef                  eyeRenderPose[2];
+				ovrVector3f               hmdToEyeOffset[2] = { eyeRenderDesc[0].HmdToEyeOffset, eyeRenderDesc[1].HmdToEyeOffset };
+				double sensorSampleTime;
+				ovr_GetEyePoses(ovr, frameIndex, ovrTrue, hmdToEyeOffset, eyeRenderPose, &sensorSampleTime);
 
-				ovrAvatarTransform left;
-				_ovrAvatarTransformFromGlm(leftP, leftQ, glm::vec3(1.0f), &left);
+				// If the avatar is initialized, update it
+				if (_avatar)
+				{
+					// Convert the OVR inputs into Avatar SDK inputs
+					ovrInputState touchState;
+					ovr_GetInputState(ovr, ovrControllerType_Active, &touchState);
+					ovrTrackingState trackingState = ovr_GetTrackingState(ovr, 0.0, false);
 
-				ovrAvatarTransform right;
-				_ovrAvatarTransformFromGlm(rightP, rightQ, glm::vec3(1.0f), &right);
+					glm::vec3 hmdP = _glmFromOvrVector(trackingState.HeadPose.ThePose.Position);
+					glm::quat hmdQ = _glmFromOvrQuat(trackingState.HeadPose.ThePose.Orientation);
+					glm::vec3 leftP = _glmFromOvrVector(trackingState.HandPoses[ovrHand_Left].ThePose.Position);
+					glm::quat leftQ = _glmFromOvrQuat(trackingState.HandPoses[ovrHand_Left].ThePose.Orientation);
+					glm::vec3 rightP = _glmFromOvrVector(trackingState.HandPoses[ovrHand_Right].ThePose.Position);
+					glm::quat rightQ = _glmFromOvrQuat(trackingState.HandPoses[ovrHand_Right].ThePose.Orientation);
 
-				ovrAvatarHandInputState inputStateLeft;
-				_ovrAvatarHandInputStateFromOvr(left, touchState, ovrHand_Left, &inputStateLeft);
+					ovrAvatarTransform hmd;
+					_ovrAvatarTransformFromGlm(hmdP, hmdQ, glm::vec3(1.0f), &hmd);
 
-				ovrAvatarHandInputState inputStateRight;
-				_ovrAvatarHandInputStateFromOvr(right, touchState, ovrHand_Right, &inputStateRight);
+					ovrAvatarTransform left;
+					_ovrAvatarTransformFromGlm(leftP, leftQ, glm::vec3(1.0f), &left);
 
-				_updateAvatar(_avatar, deltaSeconds, hmd, inputStateLeft, inputStateRight, mic, playbackPacket, &playbackTime);
+					ovrAvatarTransform right;
+					_ovrAvatarTransformFromGlm(rightP, rightQ, glm::vec3(1.0f), &right);
+
+					ovrAvatarHandInputState inputStateLeft;
+					_ovrAvatarHandInputStateFromOvr(left, touchState, ovrHand_Left, &inputStateLeft);
+
+					ovrAvatarHandInputState inputStateRight;
+					_ovrAvatarHandInputStateFromOvr(right, touchState, ovrHand_Right, &inputStateRight);
+
+					_updateAvatar(_avatar, deltaSeconds, hmd, inputStateLeft, inputStateRight, mic, playbackPacket, &playbackTime);
+				}
+
+				// Render each eye
+				for (int eye = 0; eye < 2; ++eye)
+				{
+					// Switch to eye render target
+					int curIndex;
+					GLuint curTexId;
+					ovr_GetTextureSwapChainCurrentIndex(ovr, eyeSwapChains[eye], &curIndex);
+					ovr_GetTextureSwapChainBufferGL(ovr, eyeSwapChains[eye], curIndex, &curTexId);
+
+					glBindFramebuffer(GL_FRAMEBUFFER, eyeFrameBuffers[eye]);
+					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, curTexId, 0);
+					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, eyeDepthBuffers[eye], 0);
+
+					glViewport(0, 0, eyeSizes[eye].w, eyeSizes[eye].h);
+					glDepthMask(GL_TRUE);
+					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+					glEnable(GL_FRAMEBUFFER_SRGB);
+
+					surf.Bind();
+					glDrawArrays(GL_TRIANGLES, 0, 6);
+
+					ovrVector3f eyePosition = eyeRenderPose[eye].Position;
+					ovrQuatf eyeOrientation = eyeRenderPose[eye].Orientation;
+
+					glm::quat glmOrientation = _glmFromOvrQuat(eyeOrientation);
+					glm::vec3 eyeWorld = _glmFromOvrVector(eyePosition);
+					glm::vec3 eyeForward = glmOrientation * glm::vec3(0, 0, -1);
+					glm::vec3 eyeUp = glmOrientation * glm::vec3(0, 1, 0);
+					glm::mat4 view = glm::lookAt(eyeWorld, eyeWorld + eyeForward, eyeUp);
+
+					ovrMatrix4f ovrProjection = ovrMatrix4f_Projection(hmdDesc.DefaultEyeFov[eye], 0.01f, 1000.0f, ovrProjection_None);
+					glm::mat4 proj(
+						ovrProjection.M[0][0], ovrProjection.M[1][0], ovrProjection.M[2][0], ovrProjection.M[3][0],
+						ovrProjection.M[0][1], ovrProjection.M[1][1], ovrProjection.M[2][1], ovrProjection.M[3][1],
+						ovrProjection.M[0][2], ovrProjection.M[1][2], ovrProjection.M[2][2], ovrProjection.M[3][2],
+						ovrProjection.M[0][3], ovrProjection.M[1][3], ovrProjection.M[2][3], ovrProjection.M[3][3]
+					);
+
+					// If we have the avatar and have finished loading assets, render it
+					if (_avatar && !_loadingAssets && !_waitingOnCombinedMesh)
+					{
+						_renderAvatar(_avatar, ovrAvatarVisibilityFlag_FirstPerson, view, proj, eyeWorld, renderJoints);
+
+						glm::vec4 reflectionPlane = glm::vec4(0.0, 0.0, -1.0, 0.0);
+						glm::mat4 reflection = _computeReflectionMatrix(reflectionPlane);
+
+						glFrontFace(GL_CW);
+						_renderAvatar(_avatar, ovrAvatarVisibilityFlag_ThirdPerson, view * reflection, proj, glm::vec3(reflection * glm::vec4(eyeWorld, 1.0f)), renderJoints);
+						glFrontFace(GL_CCW);
+					}
+
+					// Unbind the eye buffer
+					glBindFramebuffer(GL_FRAMEBUFFER, eyeFrameBuffers[eye]);
+					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+					glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
+
+					// Commit changes to the textures so they get picked up frame
+					ovr_CommitTextureSwapChain(ovr, eyeSwapChains[eye]);
+				}
+
+				// Prepare the layers
+				ovrLayerEyeFov layerDesc;
+				memset(&layerDesc, 0, sizeof(layerDesc));
+				layerDesc.Header.Type = ovrLayerType_EyeFov;
+				layerDesc.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;   // Because OpenGL.
+				for (int eye = 0; eye < 2; ++eye)
+				{
+					layerDesc.ColorTexture[eye] = eyeSwapChains[eye];
+					layerDesc.Viewport[eye].Size = eyeSizes[eye];
+					layerDesc.Fov[eye] = hmdDesc.DefaultEyeFov[eye];
+					layerDesc.RenderPose[eye] = eyeRenderPose[eye];
+					layerDesc.SensorSampleTime = sensorSampleTime;
+				}
+
+				ovrLayerHeader* layers = &layerDesc.Header;
+				ovr_SubmitFrame(ovr, frameIndex, NULL, &layers, 1);
+
+				ovrSessionStatus sessionStatus;
+				ovr_GetSessionStatus(ovr, &sessionStatus);
+				if (sessionStatus.ShouldQuit)
+					running = false;
+				if (sessionStatus.ShouldRecenter)
+					ovr_RecenterTrackingOrigin(ovr);
+
+				// Blit mirror texture to back buffer
+				glBindFramebuffer(GL_READ_FRAMEBUFFER, mirrorFBO);
+				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+				glBlitFramebuffer(0, MIRROR_WINDOW_HEIGHT, MIRROR_WINDOW_WIDTH, 0, 0, 0, MIRROR_WINDOW_WIDTH, MIRROR_WINDOW_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+				glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 			}
 
-			// Render each eye
-			for (int eye = 0; eye < 2; ++eye)
+			// Render to 2D viewport
+			else
 			{
-				// Switch to eye render target
-				int curIndex;
-				GLuint curTexId;
-				ovr_GetTextureSwapChainCurrentIndex(ovr, eyeSwapChains[eye], &curIndex);
-				ovr_GetTextureSwapChainBufferGL(ovr, eyeSwapChains[eye], curIndex, &curTexId);
-
-				glBindFramebuffer(GL_FRAMEBUFFER, eyeFrameBuffers[eye]);
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, curTexId, 0);
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, eyeDepthBuffers[eye], 0);
-
-				glViewport(0, 0, eyeSizes[eye].w, eyeSizes[eye].h);
 				glDepthMask(GL_TRUE);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				glEnable(GL_FRAMEBUFFER_SRGB);
-
-				surf.Bind();
-				glDrawArrays(GL_TRIANGLES, 0, 6);
-
-				ovrVector3f eyePosition = eyeRenderPose[eye].Position;
-				ovrQuatf eyeOrientation = eyeRenderPose[eye].Orientation;
-				glm::quat glmOrientation = _glmFromOvrQuat(eyeOrientation);
-				glm::vec3 eyeWorld = _glmFromOvrVector(eyePosition);
-				glm::vec3 eyeForward = glmOrientation * glm::vec3(0, 0, -1);
-				glm::vec3 eyeUp = glmOrientation * glm::vec3(0, 1, 0);
-				glm::mat4 view = glm::lookAt(eyeWorld, eyeWorld + eyeForward, eyeUp);
-
-				ovrMatrix4f ovrProjection = ovrMatrix4f_Projection(hmdDesc.DefaultEyeFov[eye], 0.01f, 1000.0f, ovrProjection_None);
-				glm::mat4 proj(
-					ovrProjection.M[0][0], ovrProjection.M[1][0], ovrProjection.M[2][0], ovrProjection.M[3][0],
-					ovrProjection.M[0][1], ovrProjection.M[1][1], ovrProjection.M[2][1], ovrProjection.M[3][1],
-					ovrProjection.M[0][2], ovrProjection.M[1][2], ovrProjection.M[2][2], ovrProjection.M[3][2],
-					ovrProjection.M[0][3], ovrProjection.M[1][3], ovrProjection.M[2][3], ovrProjection.M[3][3]
-				);
-
-				// If we have the avatar and have finished loading assets, render it
-				if (_avatar && !_loadingAssets && !_waitingOnCombinedMesh)
+				glm::vec3 eyePos = glm::vec3(0, 1.0f, -2.5f);
+				glm::vec3 eyeTarget = glm::vec3(0, 1.0f, 0.0f);
+				glm::mat4 view = glm::lookAt(eyePos, eyeTarget, glm::vec3(0, 1, 0));
+				glm::mat4 proj = glm::perspectiveFov(glm::radians(45.0f), (float)MIRROR_WINDOW_WIDTH, (float)MIRROR_WINDOW_HEIGHT, 0.01f, 100000.0f);
+				if (_avatar && !_loadingAssets)
 				{
-					_renderAvatar(_avatar, ovrAvatarVisibilityFlag_FirstPerson, view, proj, eyeWorld, renderJoints);
-
-					glm::vec4 reflectionPlane = glm::vec4(0.0, 0.0, -1.0, 0.0);
-					glm::mat4 reflection = _computeReflectionMatrix(reflectionPlane);
-
-					glFrontFace(GL_CW);
-					_renderAvatar(_avatar, ovrAvatarVisibilityFlag_ThirdPerson, view * reflection, proj, glm::vec3(reflection * glm::vec4(eyeWorld, 1.0f)), renderJoints);
-					glFrontFace(GL_CCW);
-				}
-
-				// Unbind the eye buffer
-				glBindFramebuffer(GL_FRAMEBUFFER, eyeFrameBuffers[eye]);
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
-
-				// Commit changes to the textures so they get picked up frame
-				ovr_CommitTextureSwapChain(ovr, eyeSwapChains[eye]);
-			}
-
-			// Prepare the layers
-			ovrLayerEyeFov layerDesc;
-			memset(&layerDesc, 0, sizeof(layerDesc));
-			layerDesc.Header.Type = ovrLayerType_EyeFov;
-			layerDesc.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;   // Because OpenGL.
-			for (int eye = 0; eye < 2; ++eye)
-			{
-				layerDesc.ColorTexture[eye] = eyeSwapChains[eye];
-				layerDesc.Viewport[eye].Size = eyeSizes[eye];
-				layerDesc.Fov[eye] = hmdDesc.DefaultEyeFov[eye];
-				layerDesc.RenderPose[eye] = eyeRenderPose[eye];
-				layerDesc.SensorSampleTime = sensorSampleTime;
-			}
-
-			ovrLayerHeader* layers = &layerDesc.Header;
-			ovr_SubmitFrame(ovr, frameIndex, NULL, &layers, 1);
-
-			ovrSessionStatus sessionStatus;
-			ovr_GetSessionStatus(ovr, &sessionStatus);
-			if (sessionStatus.ShouldQuit)
-				running = false;
-			if (sessionStatus.ShouldRecenter)
-				ovr_RecenterTrackingOrigin(ovr);
-
-			// Blit mirror texture to back buffer
-			glBindFramebuffer(GL_READ_FRAMEBUFFER, mirrorFBO);
-			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			glBlitFramebuffer(0, MIRROR_WINDOW_HEIGHT, MIRROR_WINDOW_WIDTH, 0, 0, 0, MIRROR_WINDOW_WIDTH, MIRROR_WINDOW_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-			glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-		}
-
-		// Render to 2D viewport
-		else
-		{
-			glDepthMask(GL_TRUE);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glm::vec3 eyePos = glm::vec3(0, 1.0f, -2.5f);
-			glm::vec3 eyeTarget = glm::vec3(0, 1.0f, 0.0f);
-			glm::mat4 view = glm::lookAt(eyePos, eyeTarget, glm::vec3(0, 1, 0));
-			glm::mat4 proj = glm::perspectiveFov(glm::radians(45.0f), (float)MIRROR_WINDOW_WIDTH, (float)MIRROR_WINDOW_HEIGHT, 0.01f, 100000.0f);
-			if (_avatar && !_loadingAssets)
-			{
-				// Compute the total elapsed time so that we can animate a rotation of the avatar
-				static bool rotate = true;
-				static float rotateTheta;
-				if (rotate)
-				{
-					rotateTheta += deltaSeconds;
-					while (rotateTheta > glm::radians(360.0f))
+					// Compute the total elapsed time so that we can animate a rotation of the avatar
+					static bool rotate = true;
+					static float rotateTheta;
+					if (rotate)
 					{
-						rotateTheta -= glm::radians(360.0f);
+						rotateTheta += deltaSeconds;
+						while (rotateTheta > glm::radians(360.0f))
+						{
+							rotateTheta -= glm::radians(360.0f);
+						}
 					}
+
+					// Compute poses for each of the components
+					glm::quat orientation = glm::quat(glm::vec3(0, rotateTheta, 0));
+					glm::vec3 bodyPosition = orientation * glm::vec3(0, 1.75f, 0.25f);
+					glm::vec3 handLeftPosition = orientation * glm::vec3(-0.25, 1.5f, -0.25);
+					glm::vec3 handRightPosition = orientation * glm::vec3(0.25, 1.5f, -0.25);
+
+					ovrAvatarTransform bodyPose, handLeftPose, handRightPose;
+					_ovrAvatarTransformFromGlm(bodyPosition, orientation, glm::vec3(1, 1, 1), &bodyPose);
+					_ovrAvatarTransformFromGlm(handLeftPosition, orientation, glm::vec3(1, 1, 1), &handLeftPose);
+					_ovrAvatarTransformFromGlm(handRightPosition, orientation, glm::vec3(1, 1, 1), &handRightPose);
+
+					// Synthesize some input
+					ovrInputState inputState;
+					memset(&inputState, 0, sizeof(inputState));
+					inputState.ControllerType = ovrControllerType_Touch;
+					inputState.Touches |= ovrTouch_LIndexPointing;
+					inputState.Touches |= ovrTouch_RThumbUp;
+					inputState.HandTrigger[ovrHand_Left] = 0.5;
+					inputState.HandTrigger[ovrHand_Right] = 1.0;
+
+					ovrAvatarHandInputState leftInputState;
+					_ovrAvatarHandInputStateFromOvr(handLeftPose, inputState, ovrHand_Left, &leftInputState);
+
+					ovrAvatarHandInputState rightInputState;
+					_ovrAvatarHandInputStateFromOvr(handRightPose, inputState, ovrHand_Right, &rightInputState);
+
+					_updateAvatar(_avatar, deltaSeconds, bodyPose, leftInputState, rightInputState, mic, playbackPacket, &playbackTime);
+
+					// Render the avatar
+					_renderAvatar(_avatar, ovrAvatarVisibilityFlag_ThirdPerson, view, proj, eyePos, renderJoints);
 				}
-
-				// Compute poses for each of the components
-				glm::quat orientation = glm::quat(glm::vec3(0, rotateTheta, 0));
-				glm::vec3 bodyPosition = orientation * glm::vec3(0, 1.75f, 0.25f);
-				glm::vec3 handLeftPosition = orientation * glm::vec3(-0.25, 1.5f, -0.25);
-				glm::vec3 handRightPosition = orientation * glm::vec3(0.25, 1.5f, -0.25);
-
-				ovrAvatarTransform bodyPose, handLeftPose, handRightPose;
-				_ovrAvatarTransformFromGlm(bodyPosition, orientation, glm::vec3(1, 1, 1), &bodyPose);
-				_ovrAvatarTransformFromGlm(handLeftPosition, orientation, glm::vec3(1, 1, 1), &handLeftPose);
-				_ovrAvatarTransformFromGlm(handRightPosition, orientation, glm::vec3(1, 1, 1), &handRightPose);
-
-				// Synthesize some input
-				ovrInputState inputState;
-				memset(&inputState, 0, sizeof(inputState));
-				inputState.ControllerType = ovrControllerType_Touch;
-				inputState.Touches |= ovrTouch_LIndexPointing;
-				inputState.Touches |= ovrTouch_RThumbUp;
-				inputState.HandTrigger[ovrHand_Left] = 0.5;
-				inputState.HandTrigger[ovrHand_Right] = 1.0;
-
-				ovrAvatarHandInputState leftInputState;
-				_ovrAvatarHandInputStateFromOvr(handLeftPose, inputState, ovrHand_Left, &leftInputState);
-
-				ovrAvatarHandInputState rightInputState;
-				_ovrAvatarHandInputStateFromOvr(handRightPose, inputState, ovrHand_Right, &rightInputState);
-
-				_updateAvatar(_avatar, deltaSeconds, bodyPose, leftInputState, rightInputState, mic, playbackPacket, &playbackTime);
-
-				// Render the avatar
-				_renderAvatar(_avatar, ovrAvatarVisibilityFlag_ThirdPerson, view, proj, eyePos, renderJoints);
 			}
 		}
-
 
 
 
