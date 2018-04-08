@@ -8,6 +8,7 @@ void StandardShader::Initialize()
 	resolutionLocation = glGetUniformLocation(shaderProgram, "resolution");
 
 	variablesLocation = glGetUniformLocation(shaderProgram, "variables");
+	triggersLocation = glGetUniformLocation(shaderProgram, "triggers");
 }
 void StandardShader::Update()
 {
@@ -17,7 +18,8 @@ void StandardShader::Update()
 		glfwGetWindowSize(WindowReference, &width, &height);
 	glUniform2f(resolutionLocation, width, height);
 
-	glUniform4f(variablesLocation, a, b, c, d);
+	glUniform4f(variablesLocation, Variables[0], Variables[1], Variables[2], Variables[3]);
+	glUniform4f(triggersLocation, Triggers[0], Triggers[1], Triggers[2], Triggers[3]);
 }
 
 StandardShader::StandardShader(const char* vertexFileName, const char* fragmentFileName) :

@@ -571,7 +571,7 @@ int main()
 
 	// Load Fonts
 
-	io.Fonts->AddFontFromFileTTF("dependencies/DroidSans.ttf", 36.0f);
+	io.Fonts->AddFontFromFileTTF("dependencies/DroidSans.ttf", 16.0f);
 
 	ImGui::GetStyle().WindowRounding = 0.0f;
 
@@ -694,10 +694,16 @@ int main()
 		ovr_GetInputState(ovr, ovrControllerType_Active, &touchState);
 		ovrTrackingState trackingState = ovr_GetTrackingState(ovr, 0.0, false);
 
-		shd.a = touchState.Thumbstick[0].x;
-		shd.b = touchState.Thumbstick[0].y;
-		shd.c = touchState.Thumbstick[1].x;
-		shd.d = touchState.Thumbstick[1].y;
+		shd.Variables[0] = touchState.Thumbstick[0].x;
+		shd.Variables[1] = touchState.Thumbstick[0].y;
+		shd.Variables[2] = touchState.Thumbstick[1].x;
+		shd.Variables[3] = touchState.Thumbstick[1].y;
+
+		shd.Triggers[0] = touchState.IndexTrigger[0];
+		shd.Triggers[1] = touchState.HandTrigger[0];
+		shd.Triggers[2] = touchState.IndexTrigger[1];
+		shd.Triggers[3] = touchState.HandTrigger[1];
+
 
 		auto cpos = editor.GetCursorPosition();
 		ImGui::Begin("Text Editor Demo", nullptr, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar);
@@ -796,6 +802,13 @@ int main()
 			ImGui::Text("Left Input Y values = %f", touchState.Thumbstick[0].y * 100);
 			ImGui::Text("Right Input X values = %f", touchState.Thumbstick[1].x * 100);
 			ImGui::Text("Right Input Y values = %f", touchState.Thumbstick[1].y * 100);
+
+			ImGui::NewLine();
+
+			ImGui::Text("Left Index Trigger = %f", touchState.IndexTrigger[0] * 100);
+			ImGui::Text("Left Hand Trigger = %f", touchState.HandTrigger[0] * 100);
+			ImGui::Text("Right Index Trigger = %f", touchState.IndexTrigger[1] * 100);
+			ImGui::Text("Right Hand Trigger = %f", touchState.HandTrigger[1] * 100);
 
 			if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
 				counter++;

@@ -11,8 +11,10 @@ out vec4 outColor;
 
 uniform float time;
 uniform vec2 resolution;
+uniform vec4 variables;
+uniform vec4 triggers;
 
-
+float newTime;
 
 const int NUM_STEPS = 8;
 const float PI	 	= 3.141592;
@@ -23,11 +25,11 @@ const float EPSILON	= 1e-3;
 const int ITER_GEOMETRY = 3;
 const int ITER_FRAGMENT = 5;
 const float SEA_HEIGHT = 0.6;
-const float SEA_CHOPPY = 4.0;
-const float SEA_SPEED = 0.8;
+float SEA_CHOPPY = variables[3] * 4 + 4.0;
+float SEA_SPEED = 0.8;
 const float SEA_FREQ = 0.16;
 const vec3 SEA_BASE = vec3(0.1,0.19,0.22);
-const vec3 SEA_WATER_COLOR = vec3(0.8,0.9,0.6);
+vec3 SEA_WATER_COLOR = vec3(variables.x,variables.y, 0.6); //vec3(0.8,0.9,0.6); default
 #define SEA_TIME (1.0 + time * SEA_SPEED)
 const mat2 octave_m = mat2(1.6,1.2,-1.2,1.6);
 
@@ -171,7 +173,7 @@ void main()
 	 vec2 uv = gl_FragCoord.xy / resolution.xy;
     uv = uv * 2.0 - 1.0;
     uv.x *= resolution.x / resolution.y;
-    float time = time * 0.3 + iMouse.x*0.01;
+    float time = time * 0.3 + iMouse.x * 0.01;
 
     // ray
     vec3 ang = vec3(sin(time*3.0)*0.1,sin(time)*0.2+0.3,time);
@@ -189,7 +191,7 @@ void main()
     // color
     vec3 color = mix(
         getSkyColor(dir),
-        getSeaColor(p,n,light,dir,dist),
+        getSeaColor(p,n,light,dir,dist) * vec3(1, 1 - triggers[2], 1 - triggers[2]),
     	pow(smoothstep(0.0,-0.05,dir.y),0.3));
 
     // post

@@ -9,11 +9,13 @@ class StandardShader : public Shader
 	int resolutionLocation;
 
 	int variablesLocation;
+	int triggersLocation;
 
 public:
 	GLFWwindow* WindowReference;
 
-	float a, b, c, d;
+	float Variables[4];
+	float Triggers[4];
 
 	void Initialize();
 	void Update();
