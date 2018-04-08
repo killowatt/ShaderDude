@@ -41,6 +41,19 @@ std::string ReadFile(const char* path)
 
 #include "TextEditor.h"
 
+//Oculus
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "Oculus/OVR_Platform.h"
+#include "Oculus/OVR_PlatformVersion.h"
+#include "Oculus/OVR_CAPI.h"
+#include "Oculus/OVR_CAPI_GL.h"
+#include "Oculus/OVR_Platform.h"
+
+#define MIRROR_ALLOW_OVR true
+
+
 // Shader sources
 
 // IMGUI SHADERS
@@ -504,6 +517,22 @@ bool    ImGui_ImplGlfwGL3_Init(GLFWwindow* window, bool install_callbacks, const
 	return true;
 }
 
+static ovrSession _initOVR()
+{
+	ovrSession ovr;
+	if (OVR_SUCCESS(ovr_Initialize(NULL)))
+	{
+		ovrGraphicsLuid luid;
+		if (OVR_SUCCESS(ovr_Create(&ovr, &luid)))
+		{
+			return ovr;
+		}
+		ovr_Shutdown();
+	}
+	return NULL;
+}
+
+
 int main()
 {
 	GLFWwindow* window;
@@ -512,6 +541,11 @@ int main()
 	if (!glfwInit())
 		return -1;
 	
+	// Attempt to initialize the Oculus SDK
+	ovrSession ovr = MIRROR_ALLOW_OVR ? _initOVR() : 0;
+	ovrInputState touchState;
+	ovr_GetInputState(ovr, ovrControllerType_Active, &touchState);
+	ovrVector2f scale = { 1.0f , 1.0f };
 
 	/* Create a windowed mode window and its OpenGL context */
 	window = glfwCreateWindow(1280, 720, "Hello World", NULL, NULL);
@@ -637,6 +671,10 @@ int main()
 	bool show_demo_window = true;
 	bool show_another_window = false;
 
+	ovr_GetInputState(ovr, ovrControllerType_Active, &touchState);
+	ovrTrackingState trackingState = ovr_GetTrackingState(ovr, 0.0, false);
+
+
 	float clear_color[3] = { 0, 0, 0 };
 
 	bool running = true;
@@ -650,8 +688,16 @@ int main()
 
 		// IMGUI
 		ImGui_ImplGlfwGL3_NewFrame(window, gtime);
-
 		ImGui::GetStyle().Alpha = 0.65f;
+
+		//VR
+		ovr_GetInputState(ovr, ovrControllerType_Active, &touchState);
+		ovrTrackingState trackingState = ovr_GetTrackingState(ovr, 0.0, false);
+
+		shd.a = touchState.Thumbstick[0].x;
+		shd.b = touchState.Thumbstick[0].y;
+		shd.c = touchState.Thumbstick[1].x;
+		shd.d = touchState.Thumbstick[1].y;
 
 		auto cpos = editor.GetCursorPosition();
 		ImGui::Begin("Text Editor Demo", nullptr, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar);
@@ -745,6 +791,11 @@ int main()
 
 			ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our windows open/close state
 			ImGui::Checkbox("Another Window", &show_another_window);
+
+			ImGui::Text("Left Input X values = %f", touchState.Thumbstick[0].x * 100);
+			ImGui::Text("Left Input Y values = %f", touchState.Thumbstick[0].y * 100);
+			ImGui::Text("Right Input X values = %f", touchState.Thumbstick[1].x * 100);
+			ImGui::Text("Right Input Y values = %f", touchState.Thumbstick[1].y * 100);
 
 			if (ImGui::Button("Button"))                            // Buttons return true when clicked (NB: most widgets return true when edited/activated)
 				counter++;

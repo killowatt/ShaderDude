@@ -8,8 +8,12 @@ class StandardShader : public Shader
 	int timeLocation;
 	int resolutionLocation;
 
+	int variablesLocation;
+
 public:
 	GLFWwindow* WindowReference;
+
+	float a, b, c, d;
 
 	void Initialize();
 	void Update();

@@ -11,6 +11,8 @@ out vec4 outColor;
 uniform float time;
 uniform vec2 resolution;
 
+uniform vec4 variables;
+
 uniform sampler2D iChannel0;
 
 // http://www.fractalforums.com/new-theories-and-research/very-simple-formula-for-fractal-patterns/
@@ -75,6 +77,11 @@ void main()
   freqs[1] = 0.75;
   freqs[2] = 0.55;
   freqs[3] = 0.55;
+
+  freqs[0] = variables[0];
+  freqs[1] = variables[1];
+  freqs[2] = variables[2];
+  freqs[3] = variables[3];
 
 	float t = field(p,freqs[2]);
 	float v = (1. - exp((abs(uv.x) - 1.) * 6.)) * (1. - exp((abs(uv.y) - 1.) * 6.));

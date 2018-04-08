@@ -6,6 +6,8 @@ void StandardShader::Initialize()
 {
 	timeLocation = glGetUniformLocation(shaderProgram, "time");
 	resolutionLocation = glGetUniformLocation(shaderProgram, "resolution");
+
+	variablesLocation = glGetUniformLocation(shaderProgram, "variables");
 }
 void StandardShader::Update()
 {
@@ -14,6 +16,8 @@ void StandardShader::Update()
 	if (WindowReference)
 		glfwGetWindowSize(WindowReference, &width, &height);
 	glUniform2f(resolutionLocation, width, height);
+
+	glUniform4f(variablesLocation, a, b, c, d);
 }
 
 StandardShader::StandardShader(const char* vertexFileName, const char* fragmentFileName) :

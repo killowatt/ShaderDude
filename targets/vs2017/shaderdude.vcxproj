@@ -18,6 +18,7 @@
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Renderer.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Shader.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Surface.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\OVR_PlatformLoader.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\ShaderDude.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Shaders\StandardShader.cpp" />
   </ItemGroup>
@@ -88,7 +89,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;$(SolutionDir)dependencies\Debug\glfw3.lib;$(SolutionDir)dependencies\Debug\libglew32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;$(SolutionDir)dependencies\Debug\glfw3.lib;$(SolutionDir)dependencies\Debug\libglew32d.lib;$(SolutionDir)dependencies\Oculus\LibOVRPlatform64_1.lib;$(SolutionDir)dependencies\Oculus\LibOVR.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
