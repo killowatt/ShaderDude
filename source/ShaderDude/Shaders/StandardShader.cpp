@@ -4,6 +4,7 @@
 
 void StandardShader::Initialize()
 {
+
 	timeLocation = glGetUniformLocation(shaderProgram, "time");
 
 	vec3 = glGetUniformLocation(shaderProgram, "col");

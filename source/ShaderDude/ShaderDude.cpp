@@ -462,7 +462,7 @@ int main()
 	/* Initialize the library */
 	if (!glfwInit())
 		return -1;
-
+	
 
 	/* Create a windowed mode window and its OpenGL context */
 	window = glfwCreateWindow(1280, 720, "Hello World", NULL, NULL);
@@ -540,9 +540,10 @@ int main()
 
 	shd.Initialize();
 
-	g_ShaderHandle = shd.GetProgram();
-	g_VertHandle = shd.GetShader(ShaderType::Vertex);
-	g_FragHandle = shd.GetShader(ShaderType::Fragment);
+	std::cout << shd.GetCompileLog(ShaderType::Vertex);
+	std::cout << "\n\n";
+	std::cout << shd.GetCompileLog(ShaderType::Fragment);
+
 
 	//// Create and compile the vertex shader
 	//GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -577,7 +578,7 @@ int main()
 	while (running)
 	{
 		// Clear the screen to black
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		// IMGUI
@@ -613,6 +614,7 @@ int main()
 		shd.Enable();
 		shd.Update();
 
+		//glBindVertexArray(vao);
 		// Draw a triangle from the 3 vertices
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
