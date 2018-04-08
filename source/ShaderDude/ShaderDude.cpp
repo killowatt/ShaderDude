@@ -37,22 +37,6 @@ std::string ReadFile(const char* path)
 #include "GLFW\glfw3native.h"
 
 // Shader sources
-const GLchar* vertexSource = R"glsl(
-    #version 150 core
-    in vec2 position;
-    void main()
-    {
-        gl_Position = vec4(position, 0.0, 1.0);
-    }
-)glsl";
-const GLchar* fragmentSource = R"glsl(
-    #version 150 core
-    out vec4 outColor;
-    void main()
-    {
-        outColor = vec4(0, 1.0, 1.0, 1.0);
-    }
-)glsl";
 
 // IMGUI SHADERS
 const GLchar* vertex_shader =
