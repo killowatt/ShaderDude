@@ -11,6 +11,15 @@
     <ClCompile Include="..\..\source\ShaderDude\Shaders\StandardShader.cpp">
       <Filter>Shaders</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dependencies\ImGui\imgui.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dependencies\ImGui\imgui_demo.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dependencies\ImGui\imgui_draw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -18,6 +27,9 @@
     </Filter>
     <Filter Include="Shaders">
       <UniqueIdentifier>{95749a5d-81c9-42df-b1f3-b7b5844b01d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGui">
+      <UniqueIdentifier>{fb62c4a3-40c0-4832-ba7c-21e638af4e15}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -30,6 +42,24 @@
     <ClInclude Include="..\..\source\ShaderDude\ShaderDude.h" />
     <ClInclude Include="..\..\source\ShaderDude\Shaders\StandardShader.h">
       <Filter>Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dependencies\ImGui\imconfig.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dependencies\ImGui\imgui.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dependencies\ImGui\imgui_internal.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dependencies\ImGui\stb_rect_pack.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dependencies\ImGui\stb_textedit.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dependencies\ImGui\stb_truetype.h">
+      <Filter>ImGui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

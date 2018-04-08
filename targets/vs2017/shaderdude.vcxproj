@@ -11,12 +11,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\dependencies\ImGui\imgui.cpp" />
+    <ClCompile Include="..\..\dependencies\ImGui\imgui_demo.cpp" />
+    <ClCompile Include="..\..\dependencies\ImGui\imgui_draw.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Renderer.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Shader.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\ShaderDude.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Shaders\StandardShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dependencies\ImGui\imconfig.h" />
+    <ClInclude Include="..\..\dependencies\ImGui\imgui.h" />
+    <ClInclude Include="..\..\dependencies\ImGui\imgui_internal.h" />
+    <ClInclude Include="..\..\dependencies\ImGui\stb_rect_pack.h" />
+    <ClInclude Include="..\..\dependencies\ImGui\stb_textedit.h" />
+    <ClInclude Include="..\..\dependencies\ImGui\stb_truetype.h" />
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Renderer.h" />
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Shader.h" />
     <ClInclude Include="..\..\source\ShaderDude\ShaderDude.h" />

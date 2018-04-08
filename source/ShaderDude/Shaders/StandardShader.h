@@ -5,6 +5,8 @@
 class StandardShader : public Shader
 {
 public:
+	int timeLocation;
+
 	void Initialize();
 	void Update();
 
