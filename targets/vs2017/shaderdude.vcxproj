@@ -89,7 +89,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;$(SolutionDir)dependencies\Debug\glfw3.lib;$(SolutionDir)dependencies\Debug\libglew32d.lib;$(SolutionDir)dependencies\Oculus\LibOVRPlatform64_1.lib;$(SolutionDir)dependencies\Oculus\LibOVR.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;$(SolutionDir)dependencies\Debug\glfw3.lib;$(SolutionDir)dependencies\Debug\libglew32d.lib;$(SolutionDir)dependencies\Oculus\LibOVRPlatform64_1.lib;$(SolutionDir)dependencies\Oculus\LibOVR.lib;%(AdditionalDependencies);C:\AShaderDude2\dependencies\Oculus\SDL2.lib;C:\AShaderDude2\dependencies\Oculus\libovravatar.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
