@@ -1,13 +1,19 @@
 #version 150 core
+
+in vec2 fTexCoords;
+
 out vec4 outColor;
 
 uniform float time;
 
-uniform vec3 col;
-
 void main()
 {
-    //outColor = vec4(1.0, 0.0, 1.0, 1.0);
-    outColor = vec4(sin(time), 12.0/255.0, 151.0/255.0, 1.0);
-    //outColor = vec4(col, 1.0);
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fTexCoords;
+
+    // Time varying pixel color
+    vec3 col = 0.5 + 0.5*cos(time+uv.xyx+vec3(0,2,4));
+
+    // Output to screen
+    outColor = vec4(col,1.0);
 }

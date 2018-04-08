@@ -89,6 +89,7 @@ void ImGui_ImplGlfwGL3_RenderDrawData(ImDrawData* draw_data)
 		return;
 	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
 
+
 	// Backup GL state
 	GLenum last_active_texture; glGetIntegerv(GL_ACTIVE_TEXTURE, (GLint*)&last_active_texture);
 	glActiveTexture(GL_TEXTURE0);
@@ -480,9 +481,7 @@ int main()
 	glewExperimental = GL_TRUE;
 	glewInit();
 
-	/* Deadass Initialize IMGUI
-
-	*/
+	// Deadass Initialize IMGUI
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	ImGui_ImplGlfwGL3_Init(window, true, nullptr);
@@ -491,56 +490,18 @@ int main()
 	//ImGui::StyleColorsClassic();
 
 	// Load Fonts
-	// - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them. 
-	// - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple. 
-	// - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-	// - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-	// - Read 'misc/fonts/README.txt' for more instructions and details.
-	// - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-	//io.Fonts->AddFontDefault();
-	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-	//io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
+
 	io.Fonts->AddFontFromFileTTF("dependencies/DroidSans.ttf", 16.0f);
-	//ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-	//IM_ASSERT(font != NULL);
 
 	ImGui::GetStyle().WindowRounding = 0.0f;
 
 
 
-
-	// Tst code
-
-
-	//// Create Vertex Array Object
-	//GLuint vao;
-	//glGenVertexArrays(1, &vao);
-	//glBindVertexArray(vao);
-
-	//// Create a Vertex Buffer Object and copy the vertex data to it
-	//GLuint vbo;
-	//glGenBuffers(1, &vbo);
-
-	//GLfloat vertices[] =
-	//{
-	//	-1, 1,
-	//	1, 1,
-	//	-1, -1,
-
-	//	1, 1,
-	//	1, -1,
-	//	-1, -1
-	//};
-
-	//glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
 	Surface surf;
 	surf.Bind();
 
-	StandardShader shd("Shaders/StandardShader.vs", "Shaders/StandardShader.fs");
+	StandardShader shd("Shaders/StandardShader.vs", "Shaders/Galaxy.fs");
+	shd.WindowReference = window;
 	shd.Enable();
 
 	shd.Initialize();
@@ -549,11 +510,6 @@ int main()
 	std::cout << "\n\n";
 	std::cout << shd.GetCompileLog(ShaderType::Fragment);
 
-
-	//// Specify the layout of the vertex data
-	//GLint posAttrib = glGetAttribLocation(shd.GetProgram(), "position");
-	//glEnableVertexAttribArray(posAttrib);
-	//glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
 	// imgui]
 	bool show_demo_window = true;
@@ -589,14 +545,15 @@ int main()
 			ImGui::Text("counter = %d", counter);
 
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+
+			//ImGui::SetWindowFontScale(2.5f);
+
 		}
 
 
 		// STOP
 
-		shd.r = clear_color[0];
-		shd.g = clear_color[1];
-		shd.b = clear_color[2];
+		//io.FontGlobalScale = 2.0f;
 
 		shd.Enable();
 		shd.Update();

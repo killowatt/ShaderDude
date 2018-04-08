@@ -2,18 +2,17 @@
 
 #include "Graphics/Shader.h"
 
+class GLFWwindow;
 class StandardShader : public Shader
 {
-public:
 	int timeLocation;
+	int resolutionLocation;
+
+public:
+	GLFWwindow* WindowReference;
 
 	void Initialize();
 	void Update();
-
-	int vec3;
-	float r;
-	float g;
-	float b;
 
 	StandardShader(const char* vertexFileName, const char* fragmentFileName);
 };
