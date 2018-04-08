@@ -4,6 +4,14 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <windows.h>
+#include <stdio.h>
+#pragma comment(lib, "user32.lib")
+
+//get screen resolution
+//int height = GetSystemMetrics(SM_CYSCREEN);
+//int width = GetSystemMetrics(SM_CXSCREEN);
+
 // Shader sources
 const GLchar* vertexSource = R"glsl(
     #version 150 core
@@ -30,9 +38,8 @@ int main()
 	if (!glfwInit())
 		return -1;
 
-
 	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(1200, 480, "ShaderDude", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -54,16 +61,25 @@ int main()
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 
+	const float left = -1.0f;
+	const float right = 1.0f;
+	const float top = 1.0f;
+	const float bottom = -1.0f;
+	const float transform = 0.2f;
+
 	GLfloat vertices[] =
 	{
-		-1, 1,
-		1, 1,
-		-1, -1,
+		left, top,
+		right, top,
+		left, bottom,
 
-		1, 1,
-		1, -1,
-		-1, -1
+		right, top,
+		right, bottom,
+		left, bottom
 	};
+
+	for (int i = 0; i < 12; i++)
+		vertices[i] *= transform;
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -91,6 +107,15 @@ int main()
 	glEnableVertexAttribArray(posAttrib);
 	glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
+	//
+	GLuint tex;
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	float color[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
+
 	bool running = true;
 	while (running)
 	{
@@ -100,6 +125,13 @@ int main()
 
 		// Draw a triangle from the 3 vertices
 		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		// Black/white checkerboard
+		float pixels[] = {
+			0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
+			1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
+		};
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
 
 		// Swap buffers
 		glfwSwapBuffers(window);
