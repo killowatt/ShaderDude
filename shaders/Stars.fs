@@ -1,7 +1,17 @@
+
 // Star Nest by Pablo RomÃ¡n Andrioli
 #version 150 core
 
 // This content is under the MIT License.
+
+in vec2 fTexCoords;
+
+out vec4 outColor;
+
+uniform float time;
+uniform vec2 resolution;
+uniform vec4 variables;
+uniform vec4 triggers;
 
 #define iterations 17
 #define formuparam 0.53
@@ -13,19 +23,10 @@
 #define tile   0.850
 #define speed  0.010
 
-#define brightness 0.0015
-#define darkmatter 0.300
-#define distfading 0.730
-#define saturation 0.850
-
-
-in vec2 fTexCoords;
-
-out vec4 outColor;
-
-uniform float time;
-uniform vec2 resolution;
-
+#define brightness (0.0015 + variables[0])
+#define darkmatter (0.300 + variables[1])
+#define distfading (0.730 + variables[2])
+#define saturation (0.850 + variables[3])
 
 void main()
 {
@@ -72,5 +73,4 @@ void main()
 	}
 	v=mix(vec3(length(v)),v,saturation); //color adjust
 	outColor = vec4(v*.01,1.);
-
 }

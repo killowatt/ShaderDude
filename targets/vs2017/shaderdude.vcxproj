@@ -15,6 +15,7 @@
     <ClCompile Include="..\..\dependencies\ImGui\imgui_demo.cpp" />
     <ClCompile Include="..\..\dependencies\ImGui\imgui_draw.cpp" />
     <ClCompile Include="..\..\dependencies\ImGui\TextEditor.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\Graphics\lodepng.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Renderer.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Shader.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Surface.cpp" />
@@ -30,6 +31,7 @@
     <ClInclude Include="..\..\dependencies\ImGui\stb_textedit.h" />
     <ClInclude Include="..\..\dependencies\ImGui\stb_truetype.h" />
     <ClInclude Include="..\..\dependencies\ImGui\TextEditor.h" />
+    <ClInclude Include="..\..\source\ShaderDude\Graphics\lodepng.h" />
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Renderer.h" />
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Shader.h" />
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Surface.h" />
@@ -89,7 +91,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;$(SolutionDir)dependencies\Debug\glfw3.lib;$(SolutionDir)dependencies\Debug\libglew32d.lib;$(SolutionDir)dependencies\Oculus\LibOVRPlatform64_1.lib;$(SolutionDir)dependencies\Oculus\LibOVR.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;$(SolutionDir)dependencies\Debug\glfw3.lib;$(SolutionDir)dependencies\Debug\libglew32d.lib;$(SolutionDir)dependencies\Oculus\LibOVRPlatform64_1.lib;$(SolutionDir)dependencies\Oculus\LibOVR.lib;%(AdditionalDependencies);C:\AShaderDude2\dependencies\Oculus\SDL2.lib;C:\AShaderDude2\dependencies\Oculus\libovravatar.lib</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
