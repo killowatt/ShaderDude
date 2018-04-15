@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <map>
 #include <regex>
-#include "imgui.h"
+#include "ImGui/imgui.h"
 
 class TextEditor
 {
@@ -50,7 +50,7 @@ public:
 			, mEnabled(false)
 		{}
 	};
-	
+
 	struct Coordinates
 	{
 		int mLine, mColumn;
@@ -118,7 +118,7 @@ public:
 	typedef std::unordered_set<int> Breakpoints;
 	typedef std::array<ImU32, (unsigned)PaletteIndex::Max> Palette;
 	typedef char Char;
-	
+
 	struct Glyph
 	{
 		Char mChar;
@@ -233,14 +233,14 @@ private:
 
 		UndoRecord(
 			const std::string& aAdded,
-			const TextEditor::Coordinates aAddedStart, 
-			const TextEditor::Coordinates aAddedEnd, 
-			
-			const std::string& aRemoved, 
+			const TextEditor::Coordinates aAddedStart,
+			const TextEditor::Coordinates aAddedEnd,
+
+			const std::string& aRemoved,
 			const TextEditor::Coordinates aRemovedStart,
 			const TextEditor::Coordinates aRemovedEnd,
-			
-			TextEditor::EditorState& aBefore, 
+
+			TextEditor::EditorState& aBefore,
 			TextEditor::EditorState& aAfter);
 
 		void Undo(TextEditor* aEditor);
@@ -293,7 +293,7 @@ private:
 	EditorState mState;
 	UndoBuffer mUndoBuffer;
 	int mUndoIndex;
-	
+
 	int mTabSize;
 	bool mOverwrite;
 	bool mReadOnly;
@@ -313,4 +313,3 @@ private:
 	ImVec2 mCharAdvance;
 	Coordinates mInteractiveStart, mInteractiveEnd;
 };
-

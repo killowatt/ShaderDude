@@ -75,7 +75,7 @@ std::string TextEditor::GetText(const Coordinates & aStart, const Coordinates & 
 	int prevLineNo = aStart.mLine;
 	for (auto it = aStart; it <= aEnd; Advance(it))
 	{
-		if (prevLineNo != it.mLine && it.mLine < (int) mLines.size())
+		if (prevLineNo != it.mLine && it.mLine < (int)mLines.size())
 			result.push_back('\n');
 
 		if (it == aEnd)
@@ -538,7 +538,7 @@ void TextEditor::Render(const char* aTitle, const ImVec2& aSize, bool aBorder)
 			ImVec2 textScreenPos = ImVec2(lineStartScreenPos.x + mCharAdvance.x * cTextStart, lineStartScreenPos.y);
 
 			auto& line = mLines[lineNo];
-			longest = std::max(cTextStart + TextDistanceToLineStart(Coordinates(lineNo, (int) line.size())), longest);
+			longest = std::max(cTextStart + TextDistanceToLineStart(Coordinates(lineNo, (int)line.size())), longest);
 			auto columnNo = 0;
 			Coordinates lineStartCoord(lineNo, 0);
 			Coordinates lineEndCoord(lineNo, (int)line.size());
@@ -1309,84 +1309,84 @@ void TextEditor::Redo(int aSteps)
 const TextEditor::Palette & TextEditor::GetDarkPalette()
 {
 	static Palette p = { {
-		0xffffffff,	// None
-		0xffd69c56,	// Keyword	
-		0xff00ff00,	// Number
-		0xff7070e0,	// String
-		0xff70a0e0, // Char literal
-		0xffffffff, // Punctuation
-		0xff409090,	// Preprocessor
-		0xffaaaaaa, // Identifier
-		0xff9bc64d, // Known identifier
-		0xffc040a0, // Preproc identifier
-		0xff206020, // Comment (single line)
-		0xff406020, // Comment (multi line)
-		0xff101010, // Background
-		0xffe0e0e0, // Cursor
-		0x80a06020, // Selection
-		0x800020ff, // ErrorMarker
-		0x40f08000, // Breakpoint
-		0xff707000, // Line number
-		0x40000000, // Current line fill
-		0x40808080, // Current line fill (inactive)
-		0x40a0a0a0, // Current line edge
-	} };
+			0xffffffff,	// None
+			0xffd69c56,	// Keyword	
+			0xff00ff00,	// Number
+			0xff7070e0,	// String
+			0xff70a0e0, // Char literal
+			0xffffffff, // Punctuation
+			0xff409090,	// Preprocessor
+			0xffaaaaaa, // Identifier
+			0xff9bc64d, // Known identifier
+			0xffc040a0, // Preproc identifier
+			0xff206020, // Comment (single line)
+			0xff406020, // Comment (multi line)
+			0xff101010, // Background
+			0xffe0e0e0, // Cursor
+			0x80a06020, // Selection
+			0x800020ff, // ErrorMarker
+			0x40f08000, // Breakpoint
+			0xff707000, // Line number
+			0x40000000, // Current line fill
+			0x40808080, // Current line fill (inactive)
+			0x40a0a0a0, // Current line edge
+		} };
 	return p;
 }
 
 const TextEditor::Palette & TextEditor::GetLightPalette()
 {
 	static Palette p = { {
-		0xff000000,	// None
-		0xffff0c06,	// Keyword	
-		0xff008000,	// Number
-		0xff2020a0,	// String
-		0xff304070, // Char literal
-		0xff000000, // Punctuation
-		0xff409090,	// Preprocessor
-		0xff404040, // Identifier
-		0xff606010, // Known identifier
-		0xffc040a0, // Preproc identifier
-		0xff205020, // Comment (single line)
-		0xff405020, // Comment (multi line)
-		0xffffffff, // Background
-		0xff000000, // Cursor
-		0x80600000, // Selection
-		0xa00010ff, // ErrorMarker
-		0x80f08000, // Breakpoint
-		0xff505000, // Line number
-		0x40000000, // Current line fill
-		0x40808080, // Current line fill (inactive)
-		0x40000000, // Current line edge
-	} };
+			0xff000000,	// None
+			0xffff0c06,	// Keyword	
+			0xff008000,	// Number
+			0xff2020a0,	// String
+			0xff304070, // Char literal
+			0xff000000, // Punctuation
+			0xff409090,	// Preprocessor
+			0xff404040, // Identifier
+			0xff606010, // Known identifier
+			0xffc040a0, // Preproc identifier
+			0xff205020, // Comment (single line)
+			0xff405020, // Comment (multi line)
+			0xffffffff, // Background
+			0xff000000, // Cursor
+			0x80600000, // Selection
+			0xa00010ff, // ErrorMarker
+			0x80f08000, // Breakpoint
+			0xff505000, // Line number
+			0x40000000, // Current line fill
+			0x40808080, // Current line fill (inactive)
+			0x40000000, // Current line edge
+		} };
 	return p;
 }
 
 const TextEditor::Palette & TextEditor::GetRetroBluePalette()
 {
 	static Palette p = { {
-		0xff00ffff,	// None
-		0xffffff00,	// Keyword	
-		0xff00ff00,	// Number
-		0xff808000,	// String
-		0xff808000, // Char literal
-		0xffffffff, // Punctuation
-		0xff008000,	// Preprocessor
-		0xff00ffff, // Identifier
-		0xffffffff, // Known identifier
-		0xffff00ff, // Preproc identifier
-		0xff808080, // Comment (single line)
-		0xff404040, // Comment (multi line)
-		0xff800000, // Background
-		0xff0080ff, // Cursor
-		0x80ffff00, // Selection
-		0xa00000ff, // ErrorMarker
-		0x80ff8000, // Breakpoint
-		0xff808000, // Line number
-		0x40000000, // Current line fill
-		0x40808080, // Current line fill (inactive)
-		0x40000000, // Current line edge
-	} };
+			0xff00ffff,	// None
+			0xffffff00,	// Keyword	
+			0xff00ff00,	// Number
+			0xff808000,	// String
+			0xff808000, // Char literal
+			0xffffffff, // Punctuation
+			0xff008000,	// Preprocessor
+			0xff00ffff, // Identifier
+			0xffffffff, // Known identifier
+			0xffff00ff, // Preproc identifier
+			0xff808080, // Comment (single line)
+			0xff404040, // Comment (multi line)
+			0xff800000, // Background
+			0xff0080ff, // Cursor
+			0x80ffff00, // Selection
+			0xa00000ff, // ErrorMarker
+			0x80ff8000, // Breakpoint
+			0xff808000, // Line number
+			0x40000000, // Current line fill
+			0x40808080, // Current line fill (inactive)
+			0x40000000, // Current line edge
+		} };
 	return p;
 }
 
@@ -1486,7 +1486,7 @@ void TextEditor::ColorizeInternal()
 {
 	if (mLines.empty())
 		return;
-	
+
 	if (mCheckMultilineComments)
 	{
 		auto end = Coordinates((int)mLines.size(), 0);
@@ -1543,7 +1543,7 @@ void TextEditor::ColorizeInternal()
 						inComment = commentStart <= i;
 
 						line[i.mColumn].mMultiLineComment = inComment;
-						
+
 						auto& endStr = mLanguageDefinition.mCommentEnd;
 						if (i.mColumn + 1 >= (int)endStr.size() &&
 							std::equal(endStr.begin(), endStr.end(), from + 1 - endStr.size(), from + 1, pred))
@@ -2025,15 +2025,15 @@ TextEditor::LanguageDefinition TextEditor::LanguageDefinition::Lua()
 
 		static const char* const identifiers[] = {
 			"assert", "collectgarbage", "dofile", "error", "getmetatable", "ipairs", "loadfile", "load", "loadstring",  "next",  "pairs",  "pcall",  "print",  "rawequal",  "rawlen",  "rawget",  "rawset",
-			"select",  "setmetatable",  "tonumber",  "tostring",  "type",  "xpcall",  "_G",  "_VERSION","arshift", "band", "bnot", "bor", "bxor", "btest", "extract", "lrotate", "lshift", "replace", 
-			"rrotate", "rshift", "create", "resume", "running", "status", "wrap", "yield", "isyieldable", "debug","getuservalue", "gethook", "getinfo", "getlocal", "getregistry", "getmetatable", 
-			"getupvalue", "upvaluejoin", "upvalueid", "setuservalue", "sethook", "setlocal", "setmetatable", "setupvalue", "traceback", "close", "flush", "input", "lines", "open", "output", "popen", 
+			"select",  "setmetatable",  "tonumber",  "tostring",  "type",  "xpcall",  "_G",  "_VERSION","arshift", "band", "bnot", "bor", "bxor", "btest", "extract", "lrotate", "lshift", "replace",
+			"rrotate", "rshift", "create", "resume", "running", "status", "wrap", "yield", "isyieldable", "debug","getuservalue", "gethook", "getinfo", "getlocal", "getregistry", "getmetatable",
+			"getupvalue", "upvaluejoin", "upvalueid", "setuservalue", "sethook", "setlocal", "setmetatable", "setupvalue", "traceback", "close", "flush", "input", "lines", "open", "output", "popen",
 			"read", "tmpfile", "type", "write", "close", "flush", "lines", "read", "seek", "setvbuf", "write", "__gc", "__tostring", "abs", "acos", "asin", "atan", "ceil", "cos", "deg", "exp", "tointeger",
 			"floor", "fmod", "ult", "log", "max", "min", "modf", "rad", "random", "randomseed", "sin", "sqrt", "string", "tan", "type", "atan2", "cosh", "sinh", "tanh",
-			 "pow", "frexp", "ldexp", "log10", "pi", "huge", "maxinteger", "mininteger", "loadlib", "searchpath", "seeall", "preload", "cpath", "path", "searchers", "loaded", "module", "require", "clock",
-			 "date", "difftime", "execute", "exit", "getenv", "remove", "rename", "setlocale", "time", "tmpname", "byte", "char", "dump", "find", "format", "gmatch", "gsub", "len", "lower", "match", "rep",
-			 "reverse", "sub", "upper", "pack", "packsize", "unpack", "concat", "maxn", "insert", "pack", "unpack", "remove", "move", "sort", "offset", "codepoint", "char", "len", "codes", "charpattern",
-			 "coroutine", "table", "io", "os", "string", "utf8", "bit32", "math", "debug", "package"
+			"pow", "frexp", "ldexp", "log10", "pi", "huge", "maxinteger", "mininteger", "loadlib", "searchpath", "seeall", "preload", "cpath", "path", "searchers", "loaded", "module", "require", "clock",
+			"date", "difftime", "execute", "exit", "getenv", "remove", "rename", "setlocale", "time", "tmpname", "byte", "char", "dump", "find", "format", "gmatch", "gsub", "len", "lower", "match", "rep",
+			"reverse", "sub", "upper", "pack", "packsize", "unpack", "concat", "maxn", "insert", "pack", "unpack", "remove", "move", "sort", "offset", "codepoint", "char", "len", "codes", "charpattern",
+			"coroutine", "table", "io", "os", "string", "utf8", "bit32", "math", "debug", "package"
 		};
 		for (auto& k : identifiers)
 		{
