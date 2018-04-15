@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\source\ShaderDude\ShaderDude.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Renderer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -26,10 +25,11 @@
     <ClCompile Include="..\..\dependencies\ImGui\TextEditor.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\ShaderDude\OVR_PlatformLoader.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\lodepng.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\source\ShaderDude\Core.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Graphics">
@@ -49,7 +49,6 @@
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Shader.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\ShaderDude\ShaderDude.h" />
     <ClInclude Include="..\..\source\ShaderDude\Shaders\StandardShader.h">
       <Filter>Shaders</Filter>
     </ClInclude>
@@ -80,5 +79,6 @@
     <ClInclude Include="..\..\source\ShaderDude\Graphics\lodepng.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\ShaderDude\Core.h" />
   </ItemGroup>
 </Project>
