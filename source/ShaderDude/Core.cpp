@@ -1,4 +1,3 @@
-// vvv real stuff vvv
 #include "Core.h"
 #include <fstream>
 #include <iostream>
@@ -20,4 +19,3 @@ std::string ReadFile(const char* path)
 	std::cout << "Couldn't find " << path << "\n";
 	return std::string();
 }
-

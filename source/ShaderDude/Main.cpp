@@ -24,9 +24,12 @@
 
 // Oculus
 #include <LibOVR/OVR_CAPI.h>
+#include <LibOVR/OVR_CAPI_GL.h>
+
 
 bool UIManager::g_MouseJustPressed[3] = { false, false, false };
 
+uint64 frameIndex;
 int main()
 {
 	GLFWwindow* window;
@@ -66,6 +69,78 @@ int main()
 	ovrHmdDesc desc = ovr_GetHmdDesc(session);
 	ovrSizei resolution = desc.Resolution;
 
+	// Texture Swapchain Init
+	ovrSizei recommendedTex0Size = ovr_GetFovTextureSize(session, ovrEye_Left,
+		desc.DefaultEyeFov[0], 1.0f);
+	ovrSizei recommendedTex1Size = ovr_GetFovTextureSize(session, ovrEye_Right,
+		desc.DefaultEyeFov[1], 1.0f);
+
+	ovrSizei bufferSize;
+	bufferSize.w = recommendedTex0Size.w + recommendedTex1Size.w;
+	bufferSize.h = max(recommendedTex1Size.h, recommendedTex0Size.h);
+
+	// Use recommended sizes to actually init the swapchain
+	ovrTextureSwapChain textureSwapChain = 0;
+
+	ovrTextureSwapChainDesc swDesc = {};
+	swDesc.Type = ovrTexture_2D;
+	swDesc.ArraySize = 1;
+	swDesc.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
+	swDesc.Width = bufferSize.w;
+	swDesc.Height = bufferSize.h;
+	swDesc.MipLevels = 1;
+	swDesc.SampleCount = 1;
+	swDesc.StaticImage = ovrFalse;
+
+	uint32 ovrSwapChainId;
+	if (ovr_CreateTextureSwapChainGL(session, &swDesc, &textureSwapChain) == ovrSuccess)
+	{
+		//uint32 texId;
+		ovr_GetTextureSwapChainBufferGL(session, textureSwapChain, 0, &ovrSwapChainId);
+
+	}
+	else
+	{
+		std::cout << "Oculus Swapchain creation failed\n";
+	}
+
+
+	// OCULUS CONST
+	// Initialize VR structures, filling out description.
+	ovrEyeRenderDesc eyeRenderDesc[2];
+	ovrPosef      hmdToEyeViewPose[2];
+	ovrHmdDesc hmdDesc = ovr_GetHmdDesc(session);
+	eyeRenderDesc[0] = ovr_GetRenderDesc(session, ovrEye_Left, hmdDesc.DefaultEyeFov[0]);
+	eyeRenderDesc[1] = ovr_GetRenderDesc(session, ovrEye_Right, hmdDesc.DefaultEyeFov[1]);
+	hmdToEyeViewPose[0] = eyeRenderDesc[0].HmdToEyePose;
+	hmdToEyeViewPose[1] = eyeRenderDesc[1].HmdToEyePose;
+
+	// Initialize our single full screen Fov layer.
+	ovrLayerEyeFov layer;
+	layer.Header.Type = ovrLayerType_EyeFov;
+	layer.Header.Flags = 0;
+	layer.ColorTexture[0] = textureSwapChain;
+	layer.ColorTexture[1] = textureSwapChain;
+	layer.Fov[0] = eyeRenderDesc[0].Fov;
+	layer.Fov[1] = eyeRenderDesc[1].Fov;
+
+	layer.Viewport[0].Pos.x = 0;
+	layer.Viewport[0].Pos.y = 0;
+	layer.Viewport[0].Size.w = bufferSize.w / 2;
+	layer.Viewport[0].Size.h = bufferSize.h;
+
+	layer.Viewport[1].Pos.x = bufferSize.w / 2;
+	layer.Viewport[1].Pos.y = 0;
+	layer.Viewport[1].Size.w = bufferSize.w / 2;
+	layer.Viewport[1].Size.h = bufferSize.h;
+	// ld.RenderPose and ld.SensorSampleTime are updated later per frame.
+
+	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		std::cout << "Oculus framebuffer appears to be incomplete.\n";
+	}
+
+
 	// Initialize ImGui
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
@@ -84,6 +159,7 @@ int main()
 
 
 
+	// Initialize our shader rendering surface
 	Surface surf;
 	surf.Bind();
 
@@ -97,7 +173,7 @@ int main()
 
 	std::cout << shd.GetCompileLog(ShaderType::Vertex);
 	std::cout << "\n\n";
-	std::cout << shd.GetCompileLog(ShaderType::Fragment);
+	std::cout << shd.GetCompileLog(ShaderType::Fragment); 
 
 	///////////////////////////////////////////////////////////////////////
 	// TEXT EDITOR SAMPLE
@@ -130,12 +206,22 @@ int main()
 
 
 	// imgui]
-	bool show_demo_window = false;
-	bool show_another_window = false;
+	bool vrEnabled = false;
+	bool showHelp = false;
 
 	bool running = true;
 	while (!glfwWindowShouldClose(window))
 	{
+		// OVR Internal Timing?
+		ovrResult vrResult = ovrSuccess;
+		if (vrEnabled)
+		{
+			int currentIndex = 0;
+			ovr_GetTextureSwapChainCurrentIndex(session, textureSwapChain, &currentIndex);
+			vrResult = ovr_WaitToBeginFrame(session, 0);
+		}
+
+
 		static char fragFile[128] = "";
 
 		// Clear the screen to black
@@ -159,7 +245,6 @@ int main()
 		//shd.Triggers[1] = touchState.HandTrigger[0];
 		//shd.Triggers[2] = touchState.IndexTrigger[1];
 		//shd.Triggers[3] = touchState.HandTrigger[1];
-
 
 		auto cpos = editor.GetCursorPosition();
 		ImGui::Begin("Text Editor Demo", nullptr, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar);
@@ -243,7 +328,7 @@ int main()
 		ImGui::End();
 
 
-		if (show_another_window)
+		if (showHelp)
 		{
 
 			ImGui::Begin("Help");
@@ -260,8 +345,8 @@ int main()
 																	//ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
 																	//ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
-			ImGui::Checkbox("Show VR", &show_demo_window);      // Edit bools storing our windows open/close state
-			ImGui::Checkbox("Show Help", &show_another_window);
+			ImGui::Checkbox("Show VR", &vrEnabled);      // Edit bools storing our windows open/close state
+			ImGui::Checkbox("Show Help", &showHelp);
 
 			ImGui::InputText("Shader FileName", fragFile, IM_ARRAYSIZE(fragFile));
 
@@ -323,12 +408,43 @@ int main()
 		//io.FontGlobalScale = 2.0f;
 
 
+		// Render to OVR framebuffer
+		if (vrEnabled)
+		{
+			vrResult = ovr_BeginFrame(session, frameIndex);
+
+			glBindFramebuffer(GL_FRAMEBUFFER, ovrSwapChainId);
+
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			for (int eye = 0; eye < 2; eye++)
+			{
+				// do some vr tracking math here
+			}
+		}
+
 		shd.Enable();
 		shd.Update();
 
 		//glBindVertexArray(vao);
 		// Draw a triangle from the 3 vertices
+		glBindVertexArray(surf.GetVertexArray());
 		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		// Reset to screen framebuffer
+		if (vrEnabled)
+		{
+			ovr_CommitTextureSwapChain(session, textureSwapChain);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+			//ovrLayerHeader* layers = &layer.Header;
+			//vrResult = ovr_EndFrame(session, 0, nullptr, &layers, 1);
+
+			ovrLayerHeader* layers = &layer.Header;
+			result = ovr_SubmitFrame(session, frameIndex, nullptr, &layers, 1);
+			// isvisible
+		}
+
 
 		// DRAW OVER IT
 		ImGui::Render();
@@ -342,6 +458,8 @@ int main()
 		int width, height;
 		glfwGetWindowSize(window, &width, &height);
 		glViewport(0, 0, width, height);
+
+		frameIndex++;
 	}
 
 	// Deinit Oculus
