@@ -92,7 +92,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;$(SolutionDir)dependencies\Debug\glfw3.lib;$(SolutionDir)dependencies\Debug\libglew32d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;$(SolutionDir)dependencies\Debug\glfw3.lib;$(SolutionDir)dependencies\Debug\libglew32d.lib;$(SolutionDir)dependencies\Release\LibOVR.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>
