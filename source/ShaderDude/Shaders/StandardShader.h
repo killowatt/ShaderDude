@@ -12,9 +12,15 @@ class StandardShader : public Shader
 	int triggersLocation;
 
 	int textureLocation;
+	uint32 tex;
+
+	int frameBufferOneLocation;
 
 public:
 	GLFWwindow* WindowReference;
+	int frameBufferOneTex;
+
+	double StartTime; // Sets start time
 
 	float Variables[4];
 	float Triggers[4];

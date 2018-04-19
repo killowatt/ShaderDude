@@ -34,6 +34,24 @@
 
 bool UIManager::g_MouseJustPressed[3] = { false, false, false };
 
+
+// New Shader Stuff
+GLuint frameBuffer_One;
+GLuint frameBufferTex_One;
+
+
+// resize resolution of framebuffer when resized!
+void windowSizeChanged(GLFWwindow* window, int width, int height)
+{
+	if (frameBufferTex_One > 0)
+	{
+		std::cout << "Framebuffer resized to " << width << "x" << height << "\n";
+		glBindTexture(GL_TEXTURE_2D, frameBufferTex_One);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
+			GL_UNSIGNED_BYTE, nullptr);
+	}
+}
+
 // transform funcz
 static glm::vec3 _glmFromOvrVector(const ovrVector3f& ovrVector)
 {
@@ -74,6 +92,11 @@ int main()
 	// Initialize GLEW
 	glewExperimental = GL_TRUE;
 	glewInit();
+	
+	// GL Settings
+	glfwSetWindowSizeCallback(window, windowSizeChanged);
+
+	glEnable(GL_TEXTURE_2D);
 
 	// Initialize OculusVR
 	bool vrCapable = true;
@@ -92,7 +115,10 @@ int main()
 	{
 		std::cout << "Couldn't create VR session\n";
 		ovr_Shutdown();
+		session = nullptr;
 		vrCapable = false;
+
+		//glfwSwapInterval(1); // redundant call to put vsync back on
 	}
 
 	// Controller Init before we do anything crazy
@@ -246,23 +272,53 @@ int main()
 	// Set our style
 	ImGui::GetStyle().WindowRounding = 0.0f;
 
+	// Initialize our first buffer
+	glGenFramebuffers(1, &frameBuffer_One);
+	glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer_One);
 
+	glGenTextures(1, &frameBufferTex_One);
+	glBindTexture(GL_TEXTURE_2D, frameBufferTex_One);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1920, 1080, 0, GL_RGB,
+		GL_UNSIGNED_BYTE, nullptr);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+		frameBufferTex_One, 0);
+
+	glClearColor(0, 0, 0, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Initialize our shader rendering surface
 	Surface surf;
 	surf.Bind();
 
-	StandardShader shd("Shaders/StandardShader.vs", "Shaders/Galaxy.fs");
+	StandardShader shd("Shaders/StandardShader.vs", "Shaders/StandardShader.fs");
 	shd.VertexFileName = "Shaders/StandardShader.vs";
-	shd.FragmentFileName = "Shaders/Galaxy.fs";
+	shd.FragmentFileName = "Shaders/StandardShader.fs";
 	shd.WindowReference = window;
+	shd.frameBufferOneTex = frameBufferTex_One;
 	shd.Enable();
-
 	shd.Initialize();
 
 	std::cout << shd.GetCompileLog(ShaderType::Vertex);
 	std::cout << "\n\n";
 	std::cout << shd.GetCompileLog(ShaderType::Fragment);
+
+
+	StandardShader bufferOneShader("Shaders/StandardShader.vs", "Shaders/StandardShader.fs");
+	bufferOneShader.VertexFileName = "Shaders/StandardShader.vs";
+	bufferOneShader.FragmentFileName = "Shaders/StandardShader.fs";
+	bufferOneShader.WindowReference = window;
+	bufferOneShader.frameBufferOneTex = frameBufferTex_One;
+	bufferOneShader.Enable();
+	bufferOneShader.Initialize();
+
+	shd.Enable(); // just in case :)
 
 	///////////////////////////////////////////////////////////////////////
 	// TEXT EDITOR SAMPLE
@@ -284,7 +340,7 @@ int main()
 	//bpts.insert(47);
 	//editor.SetBreakpoints(bpts);
 
-	static const char* fileToEdit = "shaders/OceanTest.fs";
+	static const char* fileToEdit = shd.FragmentFileName.c_str();
 	//	static const char* fileToEdit = "test.cpp";
 
 	{
@@ -294,17 +350,44 @@ int main()
 	}
 
 
-	// imgui]
+	// imgui
 	bool vrEnabled = false;
 	bool showHelp = false;
+
+	double startTime = 0;
+
+	bool bufferOneEnabled = false;
+	bool bufferOneCleared = false;
 
 	bool running = true;
 	while (!glfwWindowShouldClose(window))
 	{
+		// Buffer One Render
+		if (bufferOneEnabled)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer_One);
+
+			bufferOneShader.Enable();
+			bufferOneShader.Update();
+
+			if (!bufferOneCleared)
+			{
+				glClearColor(0, 0, 0, 1.0f);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				bufferOneCleared = true;
+			}
+
+			glBindVertexArray(surf.GetVertexArray());
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		}
+
 		static char fragFile[128] = "";
+		static char buf0File[128] = "";
 
 		// Clear the screen
-		glClearColor(1.0f, 0.0f, 0.5f, 1.0f);
+		glClearColor(1.0f, 0.0f, 110.0f/255.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 
@@ -429,9 +512,21 @@ int main()
 			ImGui::Checkbox("Show VR", &vrEnabled);      // Edit bools storing our windows open/close state
 			ImGui::Checkbox("Show Help", &showHelp);
 
+			ImGui::NewLine();
+
+			ImGui::Text("Current Time: %.2f", glfwGetTime() - startTime);
+			if (ImGui::Button("Reset Time"))
+			{
+				double t = glfwGetTime();
+				startTime = t;
+				shd.StartTime = t;
+				bufferOneShader.StartTime = t;
+				bufferOneCleared = false;
+			}
+
 			ImGui::InputText("Shader FileName", fragFile, IM_ARRAYSIZE(fragFile));
 
-			if (ImGui::Button("Recompile"))
+			if (ImGui::Button("Recompile Shader"))
 			{
 				shd.FragmentFileName = std::string(fragFile);
 
@@ -445,6 +540,29 @@ int main()
 				std::cout << shd.GetCompileLog(ShaderType::Fragment);
 				std::cout << "\n";
 			}
+
+			ImGui::InputText("Buffer 0 FileName", buf0File, IM_ARRAYSIZE(fragFile));
+
+			if (ImGui::Button("Recompile Buffer Shader"))
+			{
+				bufferOneShader.FragmentFileName = std::string(buf0File);
+
+				bufferOneShader.Recompile();
+				bufferOneShader.Enable();
+				bufferOneShader.Initialize();
+
+				std::cout << "\n\nNEW BUFFER 0\n";
+				std::cout << bufferOneShader.GetCompileLog(ShaderType::Vertex);
+				std::cout << "\n\n";
+				std::cout << bufferOneShader.GetCompileLog(ShaderType::Fragment);
+				std::cout << "\n";
+
+				bufferOneCleared = false;
+			}
+
+			ImGui::NewLine();
+
+			ImGui::Checkbox("Framebuffer One", &bufferOneEnabled);
 
 			ImGui::NewLine();
 			ImGui::NewLine();
@@ -467,7 +585,9 @@ int main()
 
 			ImGui::NewLine();
 
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+			ImGui::Text("Frame Index %d", frameIndex);
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+				1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
 			}
 
@@ -488,7 +608,7 @@ int main()
 
 		//io.FontGlobalScale = 2.0f;
 
-
+		// Final Output Render
 		shd.Enable();
 		shd.Update();
 

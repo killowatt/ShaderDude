@@ -13,10 +13,11 @@ void StandardShader::Initialize()
 
 	textureLocation = glGetUniformLocation(shaderProgram, "diffuse");
 
-	glEnable(GL_TEXTURE_2D);
-	GLuint tex;
+	frameBufferOneLocation = glGetUniformLocation(shaderProgram, "bufferOne");
+
 	glGenTextures(1, &tex);
 
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); //GL_NEAREST = no smoothing
@@ -28,13 +29,17 @@ void StandardShader::Initialize()
 	lodepng::decode(image, widthx, heightx, "texture.png");
 	glTexImage2D(GL_TEXTURE_2D, 0, 4, widthx, heightx, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.data());
 
-	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(textureLocation, 0);
 
-	glUniform1i(glGetUniformLocation(shaderProgram, "diffuse"), 0);
+
+	// BUFFER
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, frameBufferOneTex);
+	glUniform1i(frameBufferOneLocation, 1);
 }
 void StandardShader::Update()
 {
-	glUniform1f(timeLocation, glfwGetTime());
+	glUniform1f(timeLocation, glfwGetTime() - StartTime);
 	int width, height;
 	if (WindowReference)
 		glfwGetWindowSize(WindowReference, &width, &height);
@@ -43,7 +48,10 @@ void StandardShader::Update()
 	glUniform4f(variablesLocation, Variables[0], Variables[1], Variables[2], Variables[3]);
 	glUniform4f(triggersLocation, Triggers[0], Triggers[1], Triggers[2], Triggers[3]);
 
-
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, frameBufferOneTex);
 }
 
 StandardShader::StandardShader(const char* vertexFileName, const char* fragmentFileName) :

@@ -1,4 +1,5 @@
 // Standard SDE Header
+
 #version 150 core
 
 in vec2 fTexCoords;
@@ -11,3 +12,4 @@ uniform vec4 variables;
 uniform vec4 triggers;
 
 uniform sampler2D diffuse;
+uniform sampler2D bufferOne;
