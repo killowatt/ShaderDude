@@ -216,7 +216,7 @@ int main()
 	}
 	if (session)
 	{
-		ovr_SetTrackingOriginType(session, ovrTrackingOrigin_FloorLevel);
+		ovr_SetTrackingOriginType(session, ovrTrackingOrigin_EyeLevel);
 		ovr_RecenterTrackingOrigin(session);
 	}
 
@@ -670,6 +670,10 @@ int main()
 				glm::vec3 eyeForward = glmOrientation * glm::vec3(0, 0, -1);
 				glm::vec3 eyeUp = glmOrientation * glm::vec3(0, 1, 0);
 				glm::mat4 view = glm::lookAt(eyeWorld, eyeWorld + eyeForward, eyeUp);
+
+				eyePosition.x = 5;
+				eyePosition.y = 5;
+				eyePosition.z = 0;
 
 				ovrMatrix4f ovrProjection = ovrMatrix4f_Projection(hmdDesc.DefaultEyeFov[eye], 0.01f, 1000.0f, ovrProjection_None);
 				glm::mat4 proj(
