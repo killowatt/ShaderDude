@@ -45,8 +45,10 @@ static glm::quat _glmFromOvrQuat(const ovrQuatf& ovrQuat)
 	return glm::quat(ovrQuat.w, ovrQuat.x, ovrQuat.y, ovrQuat.z);
 }
 
-const int32 mirrorWidth = 1920 / 3;
-const int32 mirrorHeight = 1080 / 3;
+//const int32 mirrorWidth = 1920 / 3;
+//const int32 mirrorHeight = 1080 / 3;
+const int32 mirrorWidth = 800 / 4;
+const int32 mirrorHeight = 600 / 4;
 
 uint64 frameIndex;
 int main()
@@ -67,6 +69,8 @@ int main()
 
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
+	glfwSwapInterval(0);
+
 	// Initialize GLEW
 	glewExperimental = GL_TRUE;
 	glewInit();
@@ -109,6 +113,9 @@ int main()
 	GLuint eyeDepthBuffers[2];
 	ovrSizei eyeSizes[2];
 
+	ovrSizei bufferSize;
+	bufferSize.w = 50;
+	bufferSize.h = 50;
 	if (session)
 	{
 		for (int eye = 0; eye < 2; eye++)
@@ -152,11 +159,15 @@ int main()
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, eyeSizes[eye].w, eyeSizes[eye].h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
 		}
 
+		// calc buf size
+		bufferSize.w = eyeSizes[0].w + eyeSizes[1].w;
+		bufferSize.h = std::max(eyeSizes[0].h, eyeSizes[1].h);
+
 		// Create mirror buffer
 		ovrMirrorTextureDesc mirrorDesc;
 		memset(&mirrorDesc, 0, sizeof(mirrorDesc));
-		mirrorDesc.Width = mirrorWidth;
-		mirrorDesc.Height = mirrorHeight;
+		mirrorDesc.Width = bufferSize.w;
+		mirrorDesc.Height = bufferSize.h;
 		mirrorDesc.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
 
 		ovrMirrorTexture mirrorTexture;
@@ -472,23 +483,6 @@ int main()
 		//io.FontGlobalScale = 2.0f;
 
 
-		// Render to OVR framebuffer
-		//if (vrEnabled)
-		//{
-		//	vrResult = ovr_BeginFrame(session, frameIndex);
-
-		//	glBindFramebuffer(GL_FRAMEBUFFER, ovrSwapChainId);
-
-		//	glViewport(0, 0, bufferSize.w, bufferSize.h);
-
-		//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		//	for (int eye = 0; eye < 2; eye++)
-		//	{
-		//		// do some vr tracking math here
-		//	}
-		//}
-
 		shd.Enable();
 		shd.Update();
 
@@ -497,25 +491,12 @@ int main()
 		glBindVertexArray(surf.GetVertexArray());
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		//// Reset to screen framebuffer
-		//if (vrEnabled)
-		//{
-		//	ovr_CommitTextureSwapChain(session, textureSwapChain);
-		//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		//	ovrLayerHeader* layers = &layer.Header;
-		//	vrResult = ovr_EndFrame(session, frameIndex, nullptr, &layers, 1);
-
-		//	// isvisible
-		//}
-
-
 		// DRAW OVER IT
 		ImGui::Render();
 		ui.ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
 
-		if (session)
+		if (session && vrEnabled)
 		{
 			// Call ovr_GetRenderDesc each frame to get the ovrEyeRenderDesc, as the returned values (e.g. HmdToEyeOffset) may change at runtime.
 			ovrEyeRenderDesc eyeRenderDesc[2];
@@ -548,7 +529,9 @@ int main()
 				glViewport(0, 0, eyeSizes[eye].w, eyeSizes[eye].h);
 				glDepthMask(GL_TRUE);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				glEnable(GL_FRAMEBUFFER_SRGB);
+				// This changes the gamma of our scene in a way we dislike.
+				// Uncomment and the gamma will change back.
+				//glEnable(GL_FRAMEBUFFER_SRGB);
 
 				surf.Bind();
 				glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -606,8 +589,10 @@ int main()
 			// Blit mirror texture to back buffer
 			glBindFramebuffer(GL_READ_FRAMEBUFFER, mirrorFBO);
 			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			glBlitFramebuffer(0, mirrorWidth, mirrorHeight,
-				0, 0, 0, mirrorWidth, mirrorHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			//glBlitFramebuffer(0, mirrorWidth, mirrorHeight,
+			//	0, 0, 0, mirrorWidth, mirrorHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			glBlitFramebuffer(0, bufferSize.h, bufferSize.w,
+				0, 0, 0, bufferSize.w / 5, bufferSize.h / 5, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 			glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 		}
 
