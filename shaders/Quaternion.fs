@@ -1,3 +1,6 @@
+// Shader modified for SDE and is used for demonstration purposes only.
+// https://www.shadertoy.com/view/MsfGRr
+
 // Created by inigo quilez - iq/2013
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 

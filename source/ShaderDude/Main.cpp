@@ -76,17 +76,23 @@ int main()
 	glewInit();
 
 	// Initialize OculusVR
+	bool vrCapable = true;
+
 	ovrResult result = ovr_Initialize(nullptr);
 	if (OVR_FAILURE(result))
-		return -1;
+	{
+		std::cout << "Couldn't initialize OVR\n";
+		vrCapable = false;
+	}
 
 	ovrSession session;
 	ovrGraphicsLuid luid;
 	result = ovr_Create(&session, &luid);
 	if (OVR_FAILURE(result))
 	{
+		std::cout << "Couldn't create VR session\n";
 		ovr_Shutdown();
-		return -1;
+		vrCapable = false;
 	}
 
 	// Controller Init before we do anything crazy

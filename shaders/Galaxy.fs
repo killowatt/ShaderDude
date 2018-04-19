@@ -1,7 +1,10 @@
+// Shader modified for SDE and is used for demonstration purposes only.
+// https://www.shadertoy.com/view/MslGWN
+
 //CBS
 //Parallax scrolling fractal galaxy.
 //Inspired by JoshP's Simplicity shader: https://www.shadertoy.com/view/lslGWr
-// Modified for ShaderDude
+
 #version 150 core
 
 in vec2 fTexCoords;

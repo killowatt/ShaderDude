@@ -1,5 +1,7 @@
-// Fractal base used taken from https://www.shadertoy.com/view/lslGWr and tweaked.
 // Shader modified for SDE and is used for demonstration purposes only.
+// https://www.shadertoy.com/view/XstBR8
+
+// Fractal base used taken from https://www.shadertoy.com/view/lslGWr and tweaked.
 
 #version 150 core
 

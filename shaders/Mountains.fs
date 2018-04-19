@@ -1,3 +1,6 @@
+// Shader modified for SDE and is used for demonstration purposes only.
+// https://www.shadertoy.com/view/llsGW7
+
 //// [2TC 15] Mystery Mountains.
 // David Hoskins.
 

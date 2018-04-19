@@ -1,4 +1,6 @@
+// Shader modified for SDE and is used for demonstration purposes only.
 // http://www.pouet.net/prod.php?which=57245
+
 #version 150 core
 
 in vec2 fTexCoords;

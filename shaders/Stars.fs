@@ -1,3 +1,5 @@
+// Shader modified for SDE and is used for demonstration purposes only.
+// https://www.shadertoy.com/view/XlfGRj
 
 // Star Nest by Pablo RomÃ¡n Andrioli
 #version 150 core
