@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\source\ShaderDude\ShaderDude.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Renderer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -11,24 +10,25 @@
     <ClCompile Include="..\..\source\ShaderDude\Shaders\StandardShader.cpp">
       <Filter>Shaders</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dependencies\ImGui\imgui.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dependencies\ImGui\imgui_demo.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dependencies\ImGui\imgui_draw.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Surface.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dependencies\ImGui\TextEditor.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\ShaderDude\OVR_PlatformLoader.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\lodepng.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\ShaderDude\Core.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\Main.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\UI\ImGui\imgui.cpp">
+      <Filter>UI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\ShaderDude\UI\ImGui\imgui_demo.cpp">
+      <Filter>UI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\ShaderDude\UI\ImGui\imgui_draw.cpp">
+      <Filter>UI\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\ShaderDude\UI\TextEditor.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -38,8 +38,11 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{95749a5d-81c9-42df-b1f3-b7b5844b01d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ImGui">
-      <UniqueIdentifier>{fb62c4a3-40c0-4832-ba7c-21e638af4e15}</UniqueIdentifier>
+    <Filter Include="UI">
+      <UniqueIdentifier>{dbe61dff-2efe-4e4e-bb74-9ce3975adf37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI\ImGui">
+      <UniqueIdentifier>{ddc03457-6a3d-46ec-8108-bb1a4e75ccda}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -49,36 +52,39 @@
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Shader.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\ShaderDude\ShaderDude.h" />
     <ClInclude Include="..\..\source\ShaderDude\Shaders\StandardShader.h">
       <Filter>Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dependencies\ImGui\imconfig.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dependencies\ImGui\imgui.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dependencies\ImGui\imgui_internal.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dependencies\ImGui\stb_rect_pack.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dependencies\ImGui\stb_textedit.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dependencies\ImGui\stb_truetype.h">
-      <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Surface.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dependencies\ImGui\TextEditor.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\ShaderDude\Graphics\lodepng.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ShaderDude\Core.h" />
+    <ClInclude Include="..\..\source\ShaderDude\UI\ImGui\imconfig.h">
+      <Filter>UI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ShaderDude\UI\ImGui\imgui.h">
+      <Filter>UI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ShaderDude\UI\ImGui\imgui_internal.h">
+      <Filter>UI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ShaderDude\UI\ImGui\stb_rect_pack.h">
+      <Filter>UI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ShaderDude\UI\ImGui\stb_textedit.h">
+      <Filter>UI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ShaderDude\UI\ImGui\stb_truetype.h">
+      <Filter>UI\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ShaderDude\UI\TextEditor.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\ShaderDude\UI\UserInterface.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

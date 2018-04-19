@@ -11,32 +11,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\dependencies\ImGui\imgui.cpp" />
-    <ClCompile Include="..\..\dependencies\ImGui\imgui_demo.cpp" />
-    <ClCompile Include="..\..\dependencies\ImGui\imgui_draw.cpp" />
-    <ClCompile Include="..\..\dependencies\ImGui\TextEditor.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\lodepng.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Renderer.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Shader.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Graphics\Surface.cpp" />
-    <ClCompile Include="..\..\source\ShaderDude\OVR_PlatformLoader.cpp" />
-    <ClCompile Include="..\..\source\ShaderDude\ShaderDude.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\Main.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\Core.cpp" />
     <ClCompile Include="..\..\source\ShaderDude\Shaders\StandardShader.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\UI\ImGui\imgui.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\UI\ImGui\imgui_demo.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\UI\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="..\..\source\ShaderDude\UI\TextEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\dependencies\ImGui\imconfig.h" />
-    <ClInclude Include="..\..\dependencies\ImGui\imgui.h" />
-    <ClInclude Include="..\..\dependencies\ImGui\imgui_internal.h" />
-    <ClInclude Include="..\..\dependencies\ImGui\stb_rect_pack.h" />
-    <ClInclude Include="..\..\dependencies\ImGui\stb_textedit.h" />
-    <ClInclude Include="..\..\dependencies\ImGui\stb_truetype.h" />
-    <ClInclude Include="..\..\dependencies\ImGui\TextEditor.h" />
     <ClInclude Include="..\..\source\ShaderDude\Graphics\lodepng.h" />
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Renderer.h" />
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Shader.h" />
     <ClInclude Include="..\..\source\ShaderDude\Graphics\Surface.h" />
-    <ClInclude Include="..\..\source\ShaderDude\ShaderDude.h" />
+    <ClInclude Include="..\..\source\ShaderDude\Core.h" />
     <ClInclude Include="..\..\source\ShaderDude\Shaders\StandardShader.h" />
+    <ClInclude Include="..\..\source\ShaderDude\UI\ImGui\imconfig.h" />
+    <ClInclude Include="..\..\source\ShaderDude\UI\ImGui\imgui.h" />
+    <ClInclude Include="..\..\source\ShaderDude\UI\ImGui\imgui_internal.h" />
+    <ClInclude Include="..\..\source\ShaderDude\UI\ImGui\stb_rect_pack.h" />
+    <ClInclude Include="..\..\source\ShaderDude\UI\ImGui\stb_textedit.h" />
+    <ClInclude Include="..\..\source\ShaderDude\UI\ImGui\stb_truetype.h" />
+    <ClInclude Include="..\..\source\ShaderDude\UI\TextEditor.h" />
+    <ClInclude Include="..\..\source\ShaderDude\UI\UserInterface.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -91,7 +92,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;$(SolutionDir)dependencies\Debug\glfw3.lib;$(SolutionDir)dependencies\Debug\libglew32d.lib;$(SolutionDir)dependencies\Oculus\LibOVRPlatform64_1.lib;$(SolutionDir)dependencies\Oculus\LibOVR.lib;%(AdditionalDependencies);C:\AShaderDude2\dependencies\Oculus\SDL2.lib;C:\AShaderDude2\dependencies\Oculus\libovravatar.lib</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;$(SolutionDir)dependencies\Debug\glfw3.lib;$(SolutionDir)dependencies\Debug\libglew32d.lib;$(SolutionDir)dependencies\Debug\LibOVR.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>

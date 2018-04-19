@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ShaderDude.h"
+#include "Core.h"
 #include <string>
 
 enum class ShaderType
