@@ -26,8 +26,27 @@
 #include <LibOVR/OVR_CAPI.h>
 #include <LibOVR/OVR_CAPI_GL.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 
 bool UIManager::g_MouseJustPressed[3] = { false, false, false };
+
+// transform funcz
+static glm::vec3 _glmFromOvrVector(const ovrVector3f& ovrVector)
+{
+	return glm::vec3(ovrVector.x, ovrVector.y, ovrVector.z);
+}
+
+static glm::quat _glmFromOvrQuat(const ovrQuatf& ovrQuat)
+{
+	return glm::quat(ovrQuat.w, ovrQuat.x, ovrQuat.y, ovrQuat.z);
+}
+
+const int32 mirrorWidth = 1920 / 3;
+const int32 mirrorHeight = 1080 / 3;
 
 uint64 frameIndex;
 int main()
@@ -66,79 +85,132 @@ int main()
 		return -1;
 	}
 
-	ovrHmdDesc desc = ovr_GetHmdDesc(session);
-	ovrSizei resolution = desc.Resolution;
+	// Controller Init before we do anything crazy
+	ovrInputState touchState;
+	ovr_GetInputState(session, ovrControllerType_Active, &touchState);
 
-	// Texture Swapchain Init
-	ovrSizei recommendedTex0Size = ovr_GetFovTextureSize(session, ovrEye_Left,
-		desc.DefaultEyeFov[0], 1.0f);
-	ovrSizei recommendedTex1Size = ovr_GetFovTextureSize(session, ovrEye_Right,
-		desc.DefaultEyeFov[1], 1.0f);
-
-	ovrSizei bufferSize;
-	bufferSize.w = recommendedTex0Size.w + recommendedTex1Size.w;
-	bufferSize.h = max(recommendedTex1Size.h, recommendedTex0Size.h);
-
-	// Use recommended sizes to actually init the swapchain
-	ovrTextureSwapChain textureSwapChain = 0;
-
-	ovrTextureSwapChainDesc swDesc = {};
-	swDesc.Type = ovrTexture_2D;
-	swDesc.ArraySize = 1;
-	swDesc.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
-	swDesc.Width = bufferSize.w;
-	swDesc.Height = bufferSize.h;
-	swDesc.MipLevels = 1;
-	swDesc.SampleCount = 1;
-	swDesc.StaticImage = ovrFalse;
-
-	uint32 ovrSwapChainId;
-	if (ovr_CreateTextureSwapChainGL(session, &swDesc, &textureSwapChain) == ovrSuccess)
-	{
-		//uint32 texId;
-		ovr_GetTextureSwapChainBufferGL(session, textureSwapChain, 0, &ovrSwapChainId);
-
-	}
-	else
-	{
-		std::cout << "Oculus Swapchain creation failed\n";
-	}
-
-
-	// OCULUS CONST
-	// Initialize VR structures, filling out description.
-	ovrEyeRenderDesc eyeRenderDesc[2];
-	ovrPosef      hmdToEyeViewPose[2];
 	ovrHmdDesc hmdDesc = ovr_GetHmdDesc(session);
-	eyeRenderDesc[0] = ovr_GetRenderDesc(session, ovrEye_Left, hmdDesc.DefaultEyeFov[0]);
-	eyeRenderDesc[1] = ovr_GetRenderDesc(session, ovrEye_Right, hmdDesc.DefaultEyeFov[1]);
-	hmdToEyeViewPose[0] = eyeRenderDesc[0].HmdToEyePose;
-	hmdToEyeViewPose[1] = eyeRenderDesc[1].HmdToEyePose;
+	ovrSizei resolution = hmdDesc.Resolution;
 
-	// Initialize our single full screen Fov layer.
-	ovrLayerEyeFov layer;
-	layer.Header.Type = ovrLayerType_EyeFov;
-	layer.Header.Flags = 0;
-	layer.ColorTexture[0] = textureSwapChain;
-	layer.ColorTexture[1] = textureSwapChain;
-	layer.Fov[0] = eyeRenderDesc[0].Fov;
-	layer.Fov[1] = eyeRenderDesc[1].Fov;
+	//// Texture Swapchain Init
+	//ovrSizei recommendedTex0Size = ovr_GetFovTextureSize(session, ovrEye_Left,
+	//	desc.DefaultEyeFov[0], 1.0f);
+	//ovrSizei recommendedTex1Size = ovr_GetFovTextureSize(session, ovrEye_Right,
+	//	desc.DefaultEyeFov[1], 1.0f);
 
-	layer.Viewport[0].Pos.x = 0;
-	layer.Viewport[0].Pos.y = 0;
-	layer.Viewport[0].Size.w = bufferSize.w / 2;
-	layer.Viewport[0].Size.h = bufferSize.h;
+	//ovrSizei bufferSize;
+	//bufferSize.w = recommendedTex0Size.w + recommendedTex1Size.w;
+	//bufferSize.h = max(recommendedTex1Size.h, recommendedTex0Size.h);
 
-	layer.Viewport[1].Pos.x = bufferSize.w / 2;
-	layer.Viewport[1].Pos.y = 0;
-	layer.Viewport[1].Size.w = bufferSize.w / 2;
-	layer.Viewport[1].Size.h = bufferSize.h;
-	// ld.RenderPose and ld.SensorSampleTime are updated later per frame.
+	// Mirror/Swapchain init
+	GLuint mirrorFBO = 0;
+	ovrTextureSwapChain textureSwapChains[2];
+	GLuint eyeFrameBuffers[2];
+	GLuint eyeDepthBuffers[2];
+	ovrSizei eyeSizes[2];
 
-	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	if (session)
 	{
-		std::cout << "Oculus framebuffer appears to be incomplete.\n";
+		for (int eye = 0; eye < 2; eye++)
+		{
+			eyeSizes[eye] = ovr_GetFovTextureSize(session, (ovrEyeType)eye, hmdDesc.DefaultEyeFov[eye], 1.0f);
+
+			// Create the swap chain
+			ovrTextureSwapChainDesc desc;
+			memset(&desc, 0, sizeof(desc));
+			desc.Type = ovrTexture_2D;
+			desc.ArraySize = 1;
+			desc.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
+			desc.Width = eyeSizes[eye].w;
+			desc.Height = eyeSizes[eye].h;
+			desc.MipLevels = 1;
+			desc.SampleCount = 1;
+			desc.StaticImage = ovrFalse;
+
+			ovr_CreateTextureSwapChainGL(session, &desc, &textureSwapChains[eye]);
+
+			int length = 0;
+			ovr_GetTextureSwapChainLength(session, textureSwapChains[eye], &length);
+			for (int i = 0; i < length; ++i)
+			{
+				GLuint chainTexId;
+				ovr_GetTextureSwapChainBufferGL(session, textureSwapChains[eye], i, &chainTexId);
+				glBindTexture(GL_TEXTURE_2D, chainTexId);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			}
+			glGenFramebuffers(1, &eyeFrameBuffers[eye]);
+
+			glGenTextures(1, &eyeDepthBuffers[eye]);
+			glBindTexture(GL_TEXTURE_2D, eyeDepthBuffers[eye]);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, eyeSizes[eye].w, eyeSizes[eye].h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+		}
+
+		// Create mirror buffer
+		ovrMirrorTextureDesc mirrorDesc;
+		memset(&mirrorDesc, 0, sizeof(mirrorDesc));
+		mirrorDesc.Width = mirrorWidth;
+		mirrorDesc.Height = mirrorHeight;
+		mirrorDesc.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
+
+		ovrMirrorTexture mirrorTexture;
+		ovr_CreateMirrorTextureGL(session, &mirrorDesc, &mirrorTexture);
+
+		GLuint mirrorTextureID;
+		ovr_GetMirrorTextureBufferGL(session, mirrorTexture, &mirrorTextureID);
+
+		glGenFramebuffers(1, &mirrorFBO);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, mirrorFBO);
+		glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mirrorTextureID, 0);
+		glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0);
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	}
+	if (session)
+	{
+		ovr_SetTrackingOriginType(session, ovrTrackingOrigin_FloorLevel);
+		ovr_RecenterTrackingOrigin(session);
+	}
+
+	//// OCULUS CONST
+	//// Initialize VR structures, filling out description.
+	//ovrEyeRenderDesc eyeRenderDesc[2];
+	//ovrPosef      hmdToEyeViewPose[2];
+	//ovrHmdDesc hmdDesc = ovr_GetHmdDesc(session);
+	//eyeRenderDesc[0] = ovr_GetRenderDesc(session, ovrEye_Left, hmdDesc.DefaultEyeFov[0]);
+	//eyeRenderDesc[1] = ovr_GetRenderDesc(session, ovrEye_Right, hmdDesc.DefaultEyeFov[1]);
+	//hmdToEyeViewPose[0] = eyeRenderDesc[0].HmdToEyePose;
+	//hmdToEyeViewPose[1] = eyeRenderDesc[1].HmdToEyePose;
+
+	//// Initialize our single full screen Fov layer.
+	//ovrLayerEyeFov layer;
+	//layer.Header.Type = ovrLayerType_EyeFov;
+	//layer.Header.Flags = 0;
+	//layer.ColorTexture[0] = textureSwapChain;
+	//layer.ColorTexture[1] = textureSwapChain;
+	//layer.Fov[0] = eyeRenderDesc[0].Fov;
+	//layer.Fov[1] = eyeRenderDesc[1].Fov;
+
+	//layer.Viewport[0].Pos.x = 0;
+	//layer.Viewport[0].Pos.y = 0;
+	//layer.Viewport[0].Size.w = bufferSize.w / 2;
+	//layer.Viewport[0].Size.h = bufferSize.h;
+
+	//layer.Viewport[1].Pos.x = bufferSize.w / 2;
+	//layer.Viewport[1].Pos.y = 0;
+	//layer.Viewport[1].Size.w = bufferSize.w / 2;
+	//layer.Viewport[1].Size.h = bufferSize.h;
+	//// ld.RenderPose and ld.SensorSampleTime are updated later per frame.
+
+	//if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	//{
+	//	std::cout << "Oculus framebuffer appears to be incomplete.\n";
+	//}
 
 
 	// Initialize ImGui
@@ -173,7 +245,7 @@ int main()
 
 	std::cout << shd.GetCompileLog(ShaderType::Vertex);
 	std::cout << "\n\n";
-	std::cout << shd.GetCompileLog(ShaderType::Fragment); 
+	std::cout << shd.GetCompileLog(ShaderType::Fragment);
 
 	///////////////////////////////////////////////////////////////////////
 	// TEXT EDITOR SAMPLE
@@ -212,39 +284,31 @@ int main()
 	bool running = true;
 	while (!glfwWindowShouldClose(window))
 	{
-		// OVR Internal Timing?
-		ovrResult vrResult = ovrSuccess;
-		if (vrEnabled)
-		{
-			int currentIndex = 0;
-			ovr_GetTextureSwapChainCurrentIndex(session, textureSwapChain, &currentIndex);
-			vrResult = ovr_WaitToBeginFrame(session, 0);
-		}
-
-
 		static char fragFile[128] = "";
 
-		// Clear the screen to black
+		// Clear the screen
 		glClearColor(1.0f, 0.0f, 0.5f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+
+		// Get Controller Data
+		ovr_GetInputState(session, ovrControllerType_Active, &touchState);
+		ovrTrackingState trackingState = ovr_GetTrackingState(session, 0.0, false);
+
+		shd.Variables[0] = touchState.Thumbstick[0].x;
+		shd.Variables[1] = touchState.Thumbstick[0].y;
+		shd.Variables[2] = touchState.Thumbstick[1].x;
+		shd.Variables[3] = touchState.Thumbstick[1].y;
+
+		shd.Triggers[0] = touchState.IndexTrigger[0];
+		shd.Triggers[1] = touchState.HandTrigger[0];
+		shd.Triggers[2] = touchState.IndexTrigger[1];
+		shd.Triggers[3] = touchState.HandTrigger[1];
+
 
 		// IMGUI
 		ui.ImGui_ImplGlfwGL3_NewFrame(window, ui.gtime);
 		ImGui::GetStyle().Alpha = 0.65f;
-
-		//VR
-		//ovr_GetInputState(ovr, ovrControllerType_Active, &touchState);
-		//ovrTrackingState trackingState = ovr_GetTrackingState(ovr, 0.0, false);
-
-		//shd.Variables[0] = touchState.Thumbstick[0].x;
-		//shd.Variables[1] = touchState.Thumbstick[0].y;
-		//shd.Variables[2] = touchState.Thumbstick[1].x;
-		//shd.Variables[3] = touchState.Thumbstick[1].y;
-
-		//shd.Triggers[0] = touchState.IndexTrigger[0];
-		//shd.Triggers[1] = touchState.HandTrigger[0];
-		//shd.Triggers[2] = touchState.IndexTrigger[1];
-		//shd.Triggers[3] = touchState.HandTrigger[1];
 
 		auto cpos = editor.GetCursorPosition();
 		ImGui::Begin("Text Editor Demo", nullptr, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar);
@@ -370,7 +434,7 @@ int main()
 
 			if (ImGui::CollapsingHeader("Technical Info"))
 			{
-				/*				ImGui::Text("Analog Stick Values");
+				ImGui::Text("Analog Stick Values");
 				ImGui::Text("Left Input X values = %f", touchState.Thumbstick[0].x * 100);
 				ImGui::Text("Left Input Y values = %f", touchState.Thumbstick[0].y * 100);
 				ImGui::Text("Right Input X values = %f", touchState.Thumbstick[1].x * 100);
@@ -382,7 +446,7 @@ int main()
 				ImGui::Text("Left Index Trigger = %f", touchState.IndexTrigger[0] * 100);
 				ImGui::Text("Left Hand Trigger = %f", touchState.HandTrigger[0] * 100);
 				ImGui::Text("Right Index Trigger = %f", touchState.IndexTrigger[1] * 100);
-				ImGui::Text("Right Hand Trigger = %f", touchState.HandTrigger[1] * 100)*/;
+				ImGui::Text("Right Hand Trigger = %f", touchState.HandTrigger[1] * 100);
 
 			ImGui::NewLine();
 
@@ -409,19 +473,21 @@ int main()
 
 
 		// Render to OVR framebuffer
-		if (vrEnabled)
-		{
-			vrResult = ovr_BeginFrame(session, frameIndex);
+		//if (vrEnabled)
+		//{
+		//	vrResult = ovr_BeginFrame(session, frameIndex);
 
-			glBindFramebuffer(GL_FRAMEBUFFER, ovrSwapChainId);
+		//	glBindFramebuffer(GL_FRAMEBUFFER, ovrSwapChainId);
 
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//	glViewport(0, 0, bufferSize.w, bufferSize.h);
 
-			for (int eye = 0; eye < 2; eye++)
-			{
-				// do some vr tracking math here
-			}
-		}
+		//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//	for (int eye = 0; eye < 2; eye++)
+		//	{
+		//		// do some vr tracking math here
+		//	}
+		//}
 
 		shd.Enable();
 		shd.Update();
@@ -431,24 +497,120 @@ int main()
 		glBindVertexArray(surf.GetVertexArray());
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		// Reset to screen framebuffer
-		if (vrEnabled)
-		{
-			ovr_CommitTextureSwapChain(session, textureSwapChain);
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//// Reset to screen framebuffer
+		//if (vrEnabled)
+		//{
+		//	ovr_CommitTextureSwapChain(session, textureSwapChain);
+		//	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-			//ovrLayerHeader* layers = &layer.Header;
-			//vrResult = ovr_EndFrame(session, 0, nullptr, &layers, 1);
+		//	ovrLayerHeader* layers = &layer.Header;
+		//	vrResult = ovr_EndFrame(session, frameIndex, nullptr, &layers, 1);
 
-			ovrLayerHeader* layers = &layer.Header;
-			result = ovr_SubmitFrame(session, frameIndex, nullptr, &layers, 1);
-			// isvisible
-		}
+		//	// isvisible
+		//}
 
 
 		// DRAW OVER IT
 		ImGui::Render();
 		ui.ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+		if (session)
+		{
+			// Call ovr_GetRenderDesc each frame to get the ovrEyeRenderDesc, as the returned values (e.g. HmdToEyeOffset) may change at runtime.
+			ovrEyeRenderDesc eyeRenderDesc[2];
+			eyeRenderDesc[0] = ovr_GetRenderDesc(session, ovrEye_Left, hmdDesc.DefaultEyeFov[0]);
+			eyeRenderDesc[1] = ovr_GetRenderDesc(session, ovrEye_Right, hmdDesc.DefaultEyeFov[1]);
+
+			ovrPosef eyeRenderPose[2];
+			ovrPosef hmdToEyeOffset[2] = 
+			{ eyeRenderDesc[0].HmdToEyePose, eyeRenderDesc[1].HmdToEyePose };
+
+			double sensorSampleTime;
+			ovr_GetEyePoses(session, frameIndex, ovrTrue, hmdToEyeOffset, eyeRenderPose,
+				&sensorSampleTime);
+
+			// Render each eye
+			for (int eye = 0; eye < 2; ++eye)
+			{
+				// Switch to eye render target
+				int curIndex;
+				GLuint curTexId;
+				ovr_GetTextureSwapChainCurrentIndex(session, textureSwapChains[eye],
+					&curIndex);
+				ovr_GetTextureSwapChainBufferGL(session, textureSwapChains[eye],
+					curIndex, &curTexId);
+
+				glBindFramebuffer(GL_FRAMEBUFFER, eyeFrameBuffers[eye]);
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, curTexId, 0);
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, eyeDepthBuffers[eye], 0);
+
+				glViewport(0, 0, eyeSizes[eye].w, eyeSizes[eye].h);
+				glDepthMask(GL_TRUE);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				glEnable(GL_FRAMEBUFFER_SRGB);
+
+				surf.Bind();
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+
+				ovrVector3f eyePosition = eyeRenderPose[eye].Position;
+				ovrQuatf eyeOrientation = eyeRenderPose[eye].Orientation;
+
+				glm::quat glmOrientation = _glmFromOvrQuat(eyeOrientation);
+				glm::vec3 eyeWorld = _glmFromOvrVector(eyePosition);
+				glm::vec3 eyeForward = glmOrientation * glm::vec3(0, 0, -1);
+				glm::vec3 eyeUp = glmOrientation * glm::vec3(0, 1, 0);
+				glm::mat4 view = glm::lookAt(eyeWorld, eyeWorld + eyeForward, eyeUp);
+
+				ovrMatrix4f ovrProjection = ovrMatrix4f_Projection(hmdDesc.DefaultEyeFov[eye], 0.01f, 1000.0f, ovrProjection_None);
+				glm::mat4 proj(
+					ovrProjection.M[0][0], ovrProjection.M[1][0], ovrProjection.M[2][0], ovrProjection.M[3][0],
+					ovrProjection.M[0][1], ovrProjection.M[1][1], ovrProjection.M[2][1], ovrProjection.M[3][1],
+					ovrProjection.M[0][2], ovrProjection.M[1][2], ovrProjection.M[2][2], ovrProjection.M[3][2],
+					ovrProjection.M[0][3], ovrProjection.M[1][3], ovrProjection.M[2][3], ovrProjection.M[3][3]
+				);
+
+				// Unbind the eye buffer
+				glBindFramebuffer(GL_FRAMEBUFFER, eyeFrameBuffers[eye]);
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
+
+				// Commit changes to the textures so they get picked up frame
+				ovr_CommitTextureSwapChain(session, textureSwapChains[eye]);
+			}
+
+			// Prepare the layers
+			ovrLayerEyeFov layerDesc;
+			memset(&layerDesc, 0, sizeof(layerDesc));
+			layerDesc.Header.Type = ovrLayerType_EyeFov;
+			layerDesc.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;   // Because OpenGL.
+			for (int eye = 0; eye < 2; eye++)
+			{
+				layerDesc.ColorTexture[eye] = textureSwapChains[eye];
+				layerDesc.Viewport[eye].Size = eyeSizes[eye];
+				layerDesc.Fov[eye] = hmdDesc.DefaultEyeFov[eye];
+				layerDesc.RenderPose[eye] = eyeRenderPose[eye];
+				layerDesc.SensorSampleTime = sensorSampleTime;
+			}
+
+			ovrLayerHeader* layers = &layerDesc.Header;
+			ovr_SubmitFrame(session, frameIndex, NULL, &layers, 1);
+
+			ovrSessionStatus sessionStatus;
+			ovr_GetSessionStatus(session, &sessionStatus);
+			if (sessionStatus.ShouldQuit)
+				running = false;
+			if (sessionStatus.ShouldRecenter)
+				ovr_RecenterTrackingOrigin(session);
+
+			// Blit mirror texture to back buffer
+			glBindFramebuffer(GL_READ_FRAMEBUFFER, mirrorFBO);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			glBlitFramebuffer(0, mirrorWidth, mirrorHeight,
+				0, 0, 0, mirrorWidth, mirrorHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+			glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+		}
+
 
 
 		// Swap buffers
