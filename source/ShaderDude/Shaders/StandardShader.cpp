@@ -48,6 +48,13 @@ void StandardShader::Update()
 	glUniform4f(variablesLocation, Variables[0], Variables[1], Variables[2], Variables[3]);
 	glUniform4f(triggersLocation, Triggers[0], Triggers[1], Triggers[2], Triggers[3]);
 
+
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"),
+		1, GL_FALSE, &VIEW[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "proj"),
+		1, GL_FALSE, &PROJ[0][0]);
+
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glActiveTexture(GL_TEXTURE1);

@@ -315,6 +315,10 @@ int main()
 	bufferOneShader.FragmentFileName = "Shaders/StandardShader.fs";
 	bufferOneShader.WindowReference = window;
 	bufferOneShader.frameBufferOneTex = frameBufferTex_One;
+
+	bufferOneShader.VIEW = glm::mat4(1);
+	bufferOneShader.PROJ = glm::mat4(1);
+
 	bufferOneShader.Enable();
 	bufferOneShader.Initialize();
 
@@ -352,6 +356,7 @@ int main()
 
 	// imgui
 	bool vrEnabled = false;
+	bool detatchHeadset = false;
 	bool showHelp = false;
 
 	double startTime = 0;
@@ -483,10 +488,7 @@ int main()
 			ImGui::EndMenuBar();
 		}
 
-		ImGui::Text("%6d/%-6d %6d lines  | %s | %s | %s | %s", cpos.mLine + 1, cpos.mColumn + 1, editor.GetTotalLines(),
-			editor.IsOverwrite() ? "Ovr" : "Ins",
-			editor.CanUndo() ? "*" : " ",
-			editor.GetLanguageDefinition().mName.c_str(), fileToEdit);
+		ImGui::Text("%6d/%-6d %6d lines", cpos.mLine + 1, cpos.mColumn + 1, editor.GetTotalLines());
 
 		editor.Render("TextEditor");
 		ImGui::End();
@@ -565,6 +567,14 @@ int main()
 			ImGui::Checkbox("Framebuffer One", &bufferOneEnabled);
 
 			ImGui::NewLine();
+
+			if (ImGui::Button("Reset Headpos"))
+			{
+				// TODO:
+			}
+			ImGui::Checkbox("Detach Headset", &detatchHeadset);
+
+			ImGui::NewLine();
 			ImGui::NewLine();
 
 			if (ImGui::CollapsingHeader("Technical Info"))
@@ -621,6 +631,11 @@ int main()
 		ImGui::Render();
 		ui.ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
 
+		if (!vrEnabled)
+		{
+			shd.VIEW = glm::mat4(1);
+			shd.PROJ = glm::mat4(1);
+		}
 
 		if (session && vrEnabled)
 		{
@@ -665,23 +680,34 @@ int main()
 				ovrVector3f eyePosition = eyeRenderPose[eye].Position;
 				ovrQuatf eyeOrientation = eyeRenderPose[eye].Orientation;
 
-				glm::quat glmOrientation = _glmFromOvrQuat(eyeOrientation);
-				glm::vec3 eyeWorld = _glmFromOvrVector(eyePosition);
-				glm::vec3 eyeForward = glmOrientation * glm::vec3(0, 0, -1);
-				glm::vec3 eyeUp = glmOrientation * glm::vec3(0, 1, 0);
-				glm::mat4 view = glm::lookAt(eyeWorld, eyeWorld + eyeForward, eyeUp);
+				if (detatchHeadset)
+				{
+					glm::quat glmOrientation = _glmFromOvrQuat(eyeOrientation);
+					glm::vec3 eyeWorld = _glmFromOvrVector(eyePosition);
+					glm::vec3 eyeForward = glmOrientation * glm::vec3(0, 0, -1);
+					glm::vec3 eyeUp = glmOrientation * glm::vec3(0, 1, 0);
+					glm::mat4 view = glm::lookAt(eyeWorld, eyeWorld + eyeForward, eyeUp);
 
-				eyePosition.x = 5;
-				eyePosition.y = 5;
-				eyePosition.z = 0;
+					eyePosition.x = 5;
+					eyePosition.y = 5;
+					eyePosition.z = 0;
 
-				ovrMatrix4f ovrProjection = ovrMatrix4f_Projection(hmdDesc.DefaultEyeFov[eye], 0.01f, 1000.0f, ovrProjection_None);
-				glm::mat4 proj(
-					ovrProjection.M[0][0], ovrProjection.M[1][0], ovrProjection.M[2][0], ovrProjection.M[3][0],
-					ovrProjection.M[0][1], ovrProjection.M[1][1], ovrProjection.M[2][1], ovrProjection.M[3][1],
-					ovrProjection.M[0][2], ovrProjection.M[1][2], ovrProjection.M[2][2], ovrProjection.M[3][2],
-					ovrProjection.M[0][3], ovrProjection.M[1][3], ovrProjection.M[2][3], ovrProjection.M[3][3]
-				);
+					ovrMatrix4f ovrProjection = ovrMatrix4f_Projection(hmdDesc.DefaultEyeFov[eye], 0.01f, 1000.0f, ovrProjection_None);
+					glm::mat4 proj(
+						ovrProjection.M[0][0], ovrProjection.M[1][0], ovrProjection.M[2][0], ovrProjection.M[3][0],
+						ovrProjection.M[0][1], ovrProjection.M[1][1], ovrProjection.M[2][1], ovrProjection.M[3][1],
+						ovrProjection.M[0][2], ovrProjection.M[1][2], ovrProjection.M[2][2], ovrProjection.M[3][2],
+						ovrProjection.M[0][3], ovrProjection.M[1][3], ovrProjection.M[2][3], ovrProjection.M[3][3]
+					);
+
+					shd.VIEW = view;
+					shd.PROJ = proj;
+				}
+				else
+				{
+					shd.VIEW = glm::mat4(1);
+					shd.PROJ = glm::mat4(1);
+				}
 
 				// Unbind the eye buffer
 				glBindFramebuffer(GL_FRAMEBUFFER, eyeFrameBuffers[eye]);
